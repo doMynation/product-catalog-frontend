@@ -1,0 +1,8 @@
+.paper {
+    text-align: center;
+    padding: 50px;
+    height: 500px;
+    background-image: url(http://react-material.fusetheme.com/assets/images/backgrounds/header-bg.png);
+    background-size: cover;
+    background-color: #2D323E !important;
+}

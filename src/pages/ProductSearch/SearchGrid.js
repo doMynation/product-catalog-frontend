@@ -13,16 +13,16 @@ import Icon from "@material-ui/core/es/Icon/Icon";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import LinearProgress from "@material-ui/core/es/LinearProgress/LinearProgress";
-import ProductSearchResults from "./ProductSearchResults";
+import SearchResult from "./SearchResult";
 import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
-import {changePage, changePageSize, resetSearch, sortBy} from "./actions";
+import {changePage, changePageSize, resetSearch, sortBy} from "./index";
 
 const styles = theme => ({
   row: theme.table.rows.striped
 });
 
-class ProductSearchGrid extends React.PureComponent {
+class SearchGrid extends React.PureComponent {
   render() {
     return (
       <React.Fragment>
@@ -31,7 +31,12 @@ class ProductSearchGrid extends React.PureComponent {
         <Table>
           {this.renderHead()}
           <TableBody>
-            <ProductSearchResults products={this.props.data}/>
+            {this.props.data.map((product, idx) =>
+              <SearchResult
+                product={product}
+                key={'product_' + idx}
+              />
+            )}
           </TableBody>
         </Table>
         {this.renderFooter()}
@@ -85,6 +90,7 @@ class ProductSearchGrid extends React.PureComponent {
             </IconButton>
           </Tooltip>
         </Grid>
+
         <Grid item xs={10}>
           <TablePagination
             component="div"
@@ -100,7 +106,7 @@ class ProductSearchGrid extends React.PureComponent {
   }
 }
 
-ProductSearchGrid.propTypes = {
+SearchGrid.propTypes = {
   data: PropTypes.array.isRequired,
   rowsCount: PropTypes.number.isRequired
 };
@@ -126,4 +132,4 @@ const mdtp = dispatch => ({
 export default compose(
   withStyles(styles),
   connect(mstp, mdtp)
-)(ProductSearchGrid);
+)(SearchGrid);

@@ -1,17 +1,15 @@
 import React, {Component} from 'react';
-import ProductSearchPage from './pages/ProductSearch/ProductSearchPage'
-import ProductEditPage from "./pages/ProductEdit/ProductEditPage";
+import ProductSearchPage from './pages/ProductSearch/Page'
+import ProductEditPage from "./pages/ProductEdit/Page";
 import {Route} from "react-router-dom";
-import HomePage from "./pages/HomePage/HomePage";
+import HomePage from "./pages/Home/Page";
 import Menu from "./layout/Menu";
 import Header from "./layout/Header";
 import {withStyles} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1
-  },
+  root: {},
 });
 
 class App extends Component {

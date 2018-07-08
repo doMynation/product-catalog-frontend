@@ -9,12 +9,12 @@ import Tabs from "@material-ui/core/es/Tabs/Tabs";
 import Tab from "@material-ui/core/es/Tab/Tab";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import TranslationsTab from "./TranslationsTab";
-import Typography from "@material-ui/core/es/Typography/Typography";
 import FormControl from "@material-ui/core/es/FormControl/FormControl";
 import TextField from "@material-ui/core/es/TextField/TextField";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import FormHelperText from "@material-ui/core/es/FormHelperText/FormHelperText";
 import styles from './styles';
+import PageHeader from "../../layout/PageHeader";
 
 const availableLanguages = {
   fr: "Français",
@@ -22,7 +22,7 @@ const availableLanguages = {
   es: "Español",
 };
 
-class ProductEditPage extends Component {
+class Page extends Component {
   constructor(props) {
     super(props);
 
@@ -296,7 +296,7 @@ class ProductEditPage extends Component {
 
     return (
       <div>
-        <Typography variant="display2">[{product.id}] {product.description.name}</Typography>
+        <PageHeader text={`[${product.id}] ${product.description.name}`}></PageHeader>
 
         <Tabs
           value={selectedTabIndex}
@@ -485,4 +485,4 @@ class ProductEditPage extends Component {
   }
 }
 
-export default withStyles(styles)(ProductEditPage);
+export default withStyles(styles)(Page);

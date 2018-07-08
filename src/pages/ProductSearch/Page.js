@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import 'whatwg-fetch'
-import ProductSearchGrid from "./ProductSearchGrid";
+import ProductSearchGrid from "./SearchGrid";
 import ProductRepository from "../../util/ProductRepository";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import withStyles from "@material-ui/core/es/styles/withStyles";
@@ -44,6 +44,8 @@ class ProductSearchPage extends Component {
         departments: departments,
       });
     });
+
+    this.handleTableStateChange(this.props.searchState);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {

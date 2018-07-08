@@ -1,3 +1,33 @@
+export const FILTER = 'productSearch/FILTER';
+export const RESET = 'productSearch/RESET';
+export const SORT = 'productSearch/SORT';
+export const CHANGE_PAGE = 'productSearch/CHANGE_PAGE';
+export const CHANGE_PAGE_SIZE = 'productSearch/CHANGE_PAGE_SIZE';
+
+export const applyFilters = filters => ({
+  type: FILTER,
+  filters: filters
+});
+
+export const resetSearch = () => ({
+  type: RESET
+});
+
+export const sortBy = field => ({
+  type: SORT,
+  field: field
+});
+
+export const changePage = page => ({
+  type: CHANGE_PAGE,
+  page: page
+});
+
+export const changePageSize = size => ({
+  type: CHANGE_PAGE_SIZE,
+  size: size
+});
+
 export const initialState = {
   isAdvancedSearchOpen: false,
   search: {
@@ -10,6 +40,9 @@ export const initialState = {
       name: "",
       category: "",
       department: "",
+      isKit: "",
+      isCustom: "",
+      isPart: "",
     },
     sortField: "",
     sortOrder: "asc"
@@ -18,7 +51,7 @@ export const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case "CHANGE_PAGE_SIZE":
+    case CHANGE_PAGE_SIZE:
       return {
         ...state,
         search: {
@@ -27,7 +60,7 @@ export default (state = initialState, action) => {
           page: 0
         }
       };
-    case "CHANGE_PAGE":
+    case CHANGE_PAGE:
       return {
         ...state,
         search: {
@@ -35,7 +68,7 @@ export default (state = initialState, action) => {
           page: action.page
         }
       };
-    case "SORT_BY":
+    case SORT:
       const newOrder = state.search.sortField === action.field && state.search.sortOrder === "asc" ? "desc" : "asc";
 
       return {
@@ -47,17 +80,12 @@ export default (state = initialState, action) => {
           page: 0,
         }
       };
-    case "RESET_SEARCH":
+    case RESET:
       return {
         ...state,
         search: {...initialState.search}
       };
-    case "TOGGLE_ADVANCED_FILTERS":
-      return {
-        ...state,
-        isAdvancedSearchOpen: action.isOpen
-      };
-    case "APPLY_FILTERS":
+    case FILTER:
       return {
         ...state,
         search: {

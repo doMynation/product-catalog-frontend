@@ -12,11 +12,12 @@ import FormControl from "@material-ui/core/es/FormControl/FormControl";
 import InputLabel from "@material-ui/core/es/InputLabel/InputLabel";
 import Select from "@material-ui/core/es/Select/Select";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
-import Button from "@material-ui/core/es/Button/Button";
-import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import connect from "react-redux/es/connect/connect";
-import {applyFilters, toggleAdvancedFilters} from "./actions";
-import AdvancedSearchFiltersDialog from "./AdvancedSearchFiltersDialog";
+import {applyFilters} from "./index";
+import Switch from "@material-ui/core/es/Switch/Switch";
+import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
+import FormGroup from "@material-ui/core/es/FormGroup/FormGroup";
+import FormLabel from "@material-ui/core/es/FormLabel/FormLabel";
 
 const styles = theme => ({
   root: {},
@@ -24,8 +25,8 @@ const styles = theme => ({
     backgroundColor: "white",
     color: "black"
   },
-  advancedFiltersButton: {
-    float: 'right'
+  formControl: {
+    width: '100%'
   }
 });
 
@@ -36,20 +37,36 @@ class TableFilters extends React.PureComponent {
     name: "",
     category: "",
     department: "",
+    isCustom: "",
+    isKit: "",
+    isPart: "",
   };
 
   timer = null;
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.id !== prevProps.id) {
-      this.setState({
-        id: this.props.id,
-        sku: this.props.sku,
-        name: this.props.name,
-        category: this.props.category,
-        department: this.props.department,
-      });
+    let newState = {};
+
+    for (let key of Object.keys(this.state)) {
+      if (this.props[key] !== prevProps[key]) {
+        newState[key] = this.props[key];
+      }
     }
+
+    if (Object.keys(newState).length !== 0) {
+      this.setState(newState);
+    }
+  }
+
+  handleSwitchChange = event => {
+    const name = event.target.name;
+    let value = event.target.value;
+
+    if (this.state[name] === value) {
+      value = "";
+    }
+
+    this.setState({[name]: value}, () => this.props.emit(this.state));
   }
 
   handleFilterChange = (event, isDebounced = false) => {
@@ -69,22 +86,11 @@ class TableFilters extends React.PureComponent {
     });
   }
 
-  handleAdvancedFiltersChange = advancedFilters => {
-    const newFilters = {...this.state.filters, ...advancedFilters};
-
-    console.log(newFilters);
-    this.props.emit(newFilters);
-  }
-
-
   render() {
-    const {classes, handleAdvancedFiltersClick} = this.props;
+    const {classes} = this.props;
 
     return (
       <div>
-        <AdvancedSearchFiltersDialog
-          onSubmit={this.handleAdvancedFiltersChange}
-        />
         <Card>
           <CardHeader title="Filtres" avatar={<Avatar className={classes.filterIcon}>
             <Icon>filter_list</Icon>
@@ -115,7 +121,7 @@ class TableFilters extends React.PureComponent {
               onChange={e => this.handleFilterChange(e, true)}
             />
 
-            <FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="input-category">Catégorie</InputLabel>
               <Select
                 value={this.state.category}
@@ -135,7 +141,7 @@ class TableFilters extends React.PureComponent {
 
             <br/>
 
-            <FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="input-department">Département</InputLabel>
               <Select
                 value={this.state.department}
@@ -155,11 +161,70 @@ class TableFilters extends React.PureComponent {
 
             <br/>
             <br/>
-            <Tooltip title="Filtres avancés" placement="right">
-              <Button variant="fab" mini onClick={handleAdvancedFiltersClick} className={classes.advancedFiltersButton}>
-                <Icon>more_vert</Icon>
-              </Button>
-            </Tooltip>
+
+            <FormControl component="fieldset">
+              <FormLabel component="legend">État du produit</FormLabel>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isCustom === "0"}
+                      name="isCustom"
+                      value="0"
+                      color="secondary"
+                      onChange={this.handleSwitchChange}
+                    />
+                  }
+                  label="Standard"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isCustom === "1"}
+                      name="isCustom"
+                      value="1"
+                      color="secondary"
+                      onChange={this.handleSwitchChange}
+                    />
+                  }
+                  label="Sur Mesure"
+                />
+              </FormGroup>
+            </FormControl>
+
+            <br/><br/>
+
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Type de produit</FormLabel>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isKit === "1"}
+                      name="isKit"
+                      value="1"
+                      color="primary"
+                      onChange={this.handleSwitchChange}
+                    />
+                  }
+                  label="Kit"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isPart === "1"}
+                      name="isPart"
+                      value="1"
+                      color="primary"
+                      onChange={this.handleSwitchChange}
+                    />
+                  }
+                  label="Pièce"
+                />
+              </FormGroup>
+            </FormControl>
           </CardContent>
         </Card>
       </div>
@@ -175,22 +240,18 @@ TableFilters.propTypes = {
   name: PropTypes.string,
   category: PropTypes.string,
   department: PropTypes.string,
+  isCustom: PropTypes.string,
+  isKit: PropTypes.string,
+  isPart: PropTypes.string,
 };
 
 const mstp = state => {
   const filters = state.productSearch.search.filters;
 
-  return {
-    id: filters.id,
-    sku: filters.sku,
-    name: filters.name,
-    category: filters.name,
-    department: filters.name
-  };
+  return {...filters};
 }
 
 const mdtp = dispatch => ({
-  handleAdvancedFiltersClick: () => dispatch(toggleAdvancedFilters(true)),
   emit: state => dispatch(applyFilters(state))
 });
 

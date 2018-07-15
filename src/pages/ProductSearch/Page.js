@@ -9,6 +9,7 @@ import Grid from "@material-ui/core/es/Grid/Grid";
 import TableFilters from "./TableFilters";
 import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
+import {performSearch} from "./index";
 
 const styles = theme => ({
   root: {
@@ -25,8 +26,6 @@ class ProductSearchPage extends Component {
 
     this.state = {
       isLoading: false,
-      products: [],
-      productsCount: 0,
       categories: [],
       departments: [],
     };
@@ -43,45 +42,9 @@ class ProductSearchPage extends Component {
         categories: categories,
         departments: departments,
       });
+
+      this.props.dispatch(performSearch());
     });
-
-    this.handleTableStateChange(this.props.searchState);
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.searchState !== this.props.searchState) {
-      this.handleTableStateChange(this.props.searchState);
-    }
-  }
-
-  handleTableStateChange = state => {
-    const offset = state.page * state.pageSize;
-    var sortField = null;
-    var sortDescending = null;
-
-    if (state.sortField !== null) {
-      sortField = state.sortField;
-      sortDescending = state.sortOrder === "desc";
-    }
-
-    // Filters (exclude empty ones)
-    let filters = {};
-    for (let key in state.filters) {
-      if (state.filters[key] !== "") {
-        filters[key] = state.filters[key];
-      }
-    }
-
-    this.setState({isLoading: true});
-
-    ProductRepository.searchProducts(filters, sortField, sortDescending, offset, state.pageSize)
-      .then(searchResult => {
-        this.setState({
-          isLoading: false,
-          products: searchResult.results,
-          productsCount: searchResult.totalCount,
-        });
-      });
   }
 
   render() {
@@ -103,9 +66,9 @@ class ProductSearchPage extends Component {
           <Grid item xs={12} md={10} lg={10}>
             <Paper elevation={8}>
               <ProductSearchGrid
-                isLoading={this.state.isLoading}
-                data={this.state.products}
-                rowsCount={this.state.productsCount}
+                isLoading={this.props.isLoading}
+                data={this.props.products}
+                rowsCount={this.props.productsCount}
               />
             </Paper>
           </Grid>
@@ -116,7 +79,10 @@ class ProductSearchPage extends Component {
 }
 
 const mstp = ({productSearch}) => ({
-  searchState: productSearch.search
+  searchState: productSearch.search,
+  products: productSearch.products,
+  productsCount: productSearch.productsCount,
+  isLoading: productSearch.isLoading,
 });
 
 export default compose(

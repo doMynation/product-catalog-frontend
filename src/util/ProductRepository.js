@@ -1,4 +1,5 @@
 import {API_KEY, API_URL} from "../conf";
+import * as request from "superagent";
 
 class ProductRepository {
   static searchProducts(filters, sortField, sortDescending, offset, limit) {
@@ -26,10 +27,10 @@ class ProductRepository {
 
     const url = `${ProductRepository.baseUrl}/products?${queryStringParams}`;
 
-    return fetch(url, {
-      method: "GET",
-      headers: this._prepHeaders()
-    }).then(resp => resp.json());
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
   }
 
   static get(productId) {

@@ -32,14 +32,14 @@ const styles = theme => ({
 
 class TableFilters extends React.PureComponent {
   state = {
-    id: "",
-    sku: "",
-    name: "",
-    category: "",
-    department: "",
-    isCustom: "",
-    isKit: "",
-    isPart: "",
+    id: this.props.id,
+    sku: this.props.sku,
+    name: this.props.name,
+    category: this.props.category,
+    department: this.props.department,
+    isCustom: this.props.isCustom,
+    isKit: this.props.isKit,
+    isPart: this.props.isPart,
   };
 
   timer = null;

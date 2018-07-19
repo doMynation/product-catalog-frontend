@@ -106,7 +106,6 @@ class SearchResult extends React.Component {
 
 SearchResult.propTypes = {
   product: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
   deleteProduct: PropTypes.func.isRequired
 };
 

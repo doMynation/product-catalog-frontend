@@ -18,6 +18,7 @@ import Switch from "@material-ui/core/es/Switch/Switch";
 import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
 import FormGroup from "@material-ui/core/es/FormGroup/FormGroup";
 import FormLabel from "@material-ui/core/es/FormLabel/FormLabel";
+import CategoriesDropdown from "../../shared/CategoriesDropdown";
 
 const styles = theme => ({
   root: {},
@@ -121,23 +122,15 @@ class TableFilters extends React.PureComponent {
               onChange={e => this.handleFilterChange(e, true)}
             />
 
-            <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="input-category">Catégorie</InputLabel>
-              <Select
-                value={this.state.category}
-                onChange={this.handleFilterChange}
-                inputProps={{
-                  name: 'category',
-                  id: 'input-category'
-                }}>
-                <MenuItem value="">
-                  <em>Toutes</em>
-                </MenuItem>
-                {this.props.categories.map((category, idx) => (
-                  <MenuItem key={idx} value={category.code}>{' - '.repeat(category.depth - 1)}{category.description.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <CategoriesDropdown
+              categories={this.props.categories}
+              onChange={this.handleFilterChange}
+              value={this.state.category}
+              id="categoryId"
+              name="categoryId"
+              label="Catégorie"
+              containerClass={classes.formControl}
+            />
 
             <br/>
 

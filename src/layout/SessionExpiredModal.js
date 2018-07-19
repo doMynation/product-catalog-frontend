@@ -17,5 +17,5 @@
 {/*</Dialog>*/}
 
 const mstp = state => ({
-  isSessionExpired: state.layout.isSessionExpired
+  isSessionExpired: state.shared.isSessionExpired
 });

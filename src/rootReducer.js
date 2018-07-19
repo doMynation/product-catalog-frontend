@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux';
-import layout from './shared/reducers';
+import shared from './shared/index';
 import productSearch from './pages/ProductSearch/index';
 
 export default combineReducers({
-  layout,
+  shared,
   productSearch
 });

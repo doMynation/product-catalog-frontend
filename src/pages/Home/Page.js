@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import connect from "react-redux/es/connect/connect";
-import {openMenu} from "../../shared/actions";
+import {openMenu} from "../../shared/index";
 import Button from "@material-ui/core/es/Button/Button";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import './style.css';

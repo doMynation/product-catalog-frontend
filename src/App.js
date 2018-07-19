@@ -7,6 +7,7 @@ import Menu from "./layout/Menu";
 import Header from "./layout/Header";
 import {withStyles} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Notification from "./shared/Notification";
 
 const styles = theme => ({
   root: {},
@@ -21,6 +22,7 @@ class App extends Component {
         <Grid container>
           <Grid item xs={12}>
             <Menu/>
+            <Notification/>
           </Grid>
 
           <Grid item xs={12}>

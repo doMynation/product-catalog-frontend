@@ -8,6 +8,11 @@ import Button from "@material-ui/core/es/Button/Button";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import Link from "react-router-dom/es/Link";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
+import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
+import Menu from "@material-ui/core/es/Menu/Menu";
+import connect from "react-redux/es/connect/connect";
+import compose from "redux/src/compose";
+import {deleteProduct} from "./index";
 
 const styles = theme => ({
   row: theme.table.rows.striped,
@@ -16,7 +21,34 @@ const styles = theme => ({
   }
 });
 
-class SearchResult extends React.PureComponent {
+class SearchResult extends React.Component {
+  state = {
+    moreAnchor: null
+  };
+
+  handleMore = event => {
+    this.setState({moreAnchor: event.currentTarget});
+  }
+
+  handleDelete = productId => {
+    this.setState({moreAnchor: null});
+
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit?")) {
+      return;
+    }
+
+    this.props.deleteProduct(productId)
+  }
+
+  handleDuplicate = () => {
+    this.setState({moreAnchor: null});
+    alert("TODO");
+  }
+
+  handleClose = () => {
+    this.setState({moreAnchor: null});
+  }
+
   render() {
     const {classes, product} = this.props;
 
@@ -47,11 +79,25 @@ class SearchResult extends React.PureComponent {
             </Button>
           </Tooltip>
 
-          <Tooltip title="Plus ...">
-            <IconButton>
-              <Icon>more_horiz</Icon>
-            </IconButton>
-          </Tooltip>
+          <IconButton onClick={this.handleMore}>
+            <Icon>more_horiz</Icon>
+          </IconButton>
+
+          <Menu
+            id={'more-button-' + product.id}
+            anchorEl={this.state.moreAnchor}
+            open={Boolean(this.state.moreAnchor)}
+            onClose={this.handleClose}
+          >
+            <MenuItem onClick={this.handleDuplicate}>
+              <Icon>control_point_duplicate</Icon>
+              Dupliquer
+            </MenuItem>
+            <MenuItem onClick={() => this.handleDelete(product.id)}>
+              <Icon>delete</Icon>
+              Supprimer
+            </MenuItem>
+          </Menu>
         </TableCell>
       </TableRow>
     );
@@ -59,7 +105,18 @@ class SearchResult extends React.PureComponent {
 }
 
 SearchResult.propTypes = {
-  product: PropTypes.object.isRequired
+  product: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
+  deleteProduct: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(SearchResult);
+const mstp = state => ({});
+const mdtp = dispatch => ({
+  deleteProduct: productId => dispatch(deleteProduct(productId))
+});
+
+export default compose(
+  withStyles(styles),
+  connect(mstp, mdtp)
+)(SearchResult);
+

@@ -6,7 +6,7 @@ import Toolbar from "@material-ui/core/es/Toolbar/Toolbar";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import connect from "react-redux/es/connect/connect";
-import {openMenu} from '../shared/actions'
+import {openMenu} from '../shared/index';
 
 const Header = ({handleClick}) => (
   <AppBar position="static" color="primary">

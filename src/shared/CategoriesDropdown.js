@@ -11,14 +11,13 @@ const styles = theme => ({});
 
 class CategoriesDropdown extends React.PureComponent {
   render() {
-    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", ...others} = this.props;
+    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", containerClass = "", ...others} = this.props;
 
     return (
       <React.Fragment>
-        <FormControl>
+        <FormControl className={containerClass}>
           <InputLabel htmlFor={id}>{label}</InputLabel>
           <Select
-            style={{width: 120}}
             value={value}
             onChange={onChange}
             inputProps={{
@@ -45,7 +44,10 @@ CategoriesDropdown.propTypes = {
   categories: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any.isRequired,
-  label: PropTypes.string.isRequired
+  label: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  name: PropTypes.string,
+  containerClass: PropTypes.string,
 };
 
 export default withStyles(styles)(CategoriesDropdown);

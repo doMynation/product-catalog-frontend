@@ -2,6 +2,14 @@ import {API_KEY, API_URL} from "../conf";
 import * as request from "superagent";
 
 class ProductRepository {
+  static deleteProduct(productId) {
+    const url = `${ProductRepository.baseUrl}/products/${productId}`;
+
+    return request
+      .delete(url)
+      .set(this._prepHeaders());
+  }
+
   static searchProducts(filters, sortField, sortDescending, offset, limit) {
     sortField = sortField || null;
     sortDescending = sortDescending || false;

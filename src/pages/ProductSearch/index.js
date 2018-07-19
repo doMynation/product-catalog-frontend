@@ -1,12 +1,52 @@
 import ProductRepository from "../../util/ProductRepository";
-import {showUnauthorized} from "../../shared/reducers";
+import {openNotification, showUnauthorized} from "../../shared/index";
 
-export const RECEIVE_RESULTS = 'productSearch/RECEIVE_RESULTS';
 export const FILTER = 'productSearch/FILTER';
 export const RESET = 'productSearch/RESET';
 export const SORT = 'productSearch/SORT';
 export const CHANGE_PAGE = 'productSearch/CHANGE_PAGE';
 export const CHANGE_PAGE_SIZE = 'productSearch/CHANGE_PAGE_SIZE';
+
+export const SEARCH_START = 'productSearch/SEARCH_START';
+export const SEARCH_SUCCESS = 'productSearch/SEARCH_SUCCESS';
+
+export const DUPLICATE_START = 'productSearch/DUPLICATE_START';
+export const DUPLICATE_SUCCESS = 'productSearch/DUPLICATE_SUCCESS';
+export const DUPLICATE_ERROR = 'productSearch/DUPLICATE_ERROR';
+
+export const DELETE_START = 'productSearch/DELETE_START';
+export const DELETE_SUCCESS = 'productSearch/DELETE_SUCCESS';
+export const DELETE_ERROR = 'productSearch/DELETE_ERROR';
+
+export const duplicateProduct = productId => {
+  return dispatch => {
+    dispatch({type: DELETE_START});
+
+    // Delete the product
+    ProductRepository.deleteProduct(productId)
+      .then(resp => {
+        dispatch({type: DELETE_SUCCESS});
+        dispatch(performSearch());
+      })
+      .catch(err => dispatch({type: DELETE_ERROR, message: err.message}));
+  };
+}
+export const deleteProduct = productId => {
+  return dispatch => {
+    dispatch({type: DELETE_START});
+
+    // Delete the product
+    ProductRepository.deleteProduct(productId)
+      .then(resp => {
+        dispatch({type: DELETE_SUCCESS});
+        dispatch(performSearch());
+      })
+      .catch(err => {
+        dispatch(openNotification(`Le produit ${productId} a été supprimé.`));
+        dispatch({type: DELETE_ERROR, message: err.message})
+      });
+  };
+}
 
 export const performSearch = () => {
   return (dispatch, getState) => {
@@ -29,7 +69,7 @@ export const performSearch = () => {
       }
     }
 
-    // this.setState({isLoading: true});
+    dispatch({type: SEARCH_START});
 
     ProductRepository.searchProducts(filters, sortField, sortDescending, offset, state.pageSize)
     // .timeout(2000)
@@ -50,10 +90,10 @@ export const performSearch = () => {
   };
 };
 
-export const receiveResults = (products, count) => ({
-  type: RECEIVE_RESULTS,
-  products: products,
-  productsCount: count
+export const receiveResults = (products, productsCount) => ({
+  type: SEARCH_SUCCESS,
+  products,
+  productsCount
 });
 
 export const applyFilters = filters => {
@@ -120,7 +160,6 @@ export default (state = initialState, action) => {
     case CHANGE_PAGE_SIZE:
       return {
         ...state,
-        isLoading: true,
         search: {
           ...state.search,
           pageSize: action.size,
@@ -130,7 +169,6 @@ export default (state = initialState, action) => {
     case CHANGE_PAGE:
       return {
         ...state,
-        isLoading: true,
         search: {
           ...state.search,
           page: action.page
@@ -141,7 +179,6 @@ export default (state = initialState, action) => {
 
       return {
         ...state,
-        isLoading: true,
         search: {
           ...state.search,
           sortField: action.field,
@@ -152,20 +189,23 @@ export default (state = initialState, action) => {
     case RESET:
       return {
         ...state,
-        isLoading: true,
         search: {...initialState.search}
       };
     case FILTER:
       return {
         ...state,
-        isLoading: true,
         search: {
           ...state.search,
           filters: action.filters,
           page: 0,
         }
       };
-    case RECEIVE_RESULTS:
+    case SEARCH_START:
+      return {
+        ...state,
+        isLoading: true
+      };
+    case SEARCH_SUCCESS:
       return {
         ...state,
         isLoading: false,

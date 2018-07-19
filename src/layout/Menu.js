@@ -8,7 +8,7 @@ import ListItem from "@material-ui/core/es/ListItem/ListItem";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
 import connect from "react-redux/es/connect/connect";
-import {closeMenu} from "../shared/actions";
+import {closeMenu} from "../shared/index";
 
 const Menu = ({isOpen, onClose}) => (
   <Drawer open={isOpen} onClose={onClose}>
@@ -33,7 +33,7 @@ const Menu = ({isOpen, onClose}) => (
 );
 
 const mstp = state => ({
-  isOpen: state.layout.isMenuOpen
+  isOpen: state.shared.isMenuOpen
 });
 
 const mdtp = dispatch => ({

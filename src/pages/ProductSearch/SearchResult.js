@@ -16,6 +16,9 @@ import {deleteProduct} from "./index";
 
 const styles = theme => ({
   row: theme.table.rows.striped,
+  cellDisabled: {
+    textDecoration: 'line-through'
+  },
   button: {
     margin: theme.spacing.unit
   }
@@ -51,27 +54,29 @@ class SearchResult extends React.Component {
 
   render() {
     const {classes, product} = this.props;
+    const cellClass = product.isEnabled ? '' : classes.cellDisabled;
 
     return (
       <TableRow className={classes.row}>
         <TableCell style={{textAlign: 'center'}}>
-          {
-            product.isCustom &&
-            <div><Tooltip title="Sur mesure"><Icon>star</Icon></Tooltip></div>
-          }
-
+          <div style={{width: '50px'}}>
+            {!product.isCustom && <Tooltip title="Produit standard"><Icon>star_rate</Icon></Tooltip>}
+            {product.metadata.isKit === "1" && <Tooltip title="Ensemble de produits"><Icon>vertical_split</Icon></Tooltip>}
+          </div>
+        </TableCell>
+        <TableCell style={{textAlign: 'center'}} className={cellClass}>
           {product.id}
         </TableCell>
-        <TableCell>
+        <TableCell className={cellClass}>
           {product.category.description.name}
           {
             product.department !== undefined &&
             <div>{product.department.description.name}</div>
           }
         </TableCell>
-        <TableCell>{product.sku}</TableCell>
-        <TableCell>{product.description.name}</TableCell>
-        <TableCell numeric={true} style={{minWidth: '130px'}}>{product.price.toFixed(2)} $</TableCell>
+        <TableCell className={cellClass}>{product.sku}</TableCell>
+        <TableCell className={cellClass}>{product.description.name}</TableCell>
+        <TableCell numeric={true} style={{minWidth: '130px'}} className={cellClass}>{product.price.toFixed(2)} $</TableCell>
         <TableCell style={{width: '200px'}}>
           <Tooltip title="Consulter">
             <Button mini variant="fab" color="primary" component={Link} to={'/products/' + product.id} className={classes.button}>

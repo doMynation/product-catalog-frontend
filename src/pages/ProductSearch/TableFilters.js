@@ -21,7 +21,16 @@ import FormLabel from "@material-ui/core/es/FormLabel/FormLabel";
 import CategoriesDropdown from "../../shared/CategoriesDropdown";
 
 const styles = theme => ({
-  root: {},
+  colorSwitchBase: {
+    '&$colorChecked': {
+      color: theme.colors.success,
+      '& + $colorBar': {
+        backgroundColor: theme.colors.success,
+      },
+    },
+  },
+  colorBar: {},
+  colorChecked: {},
   filterIcon: {
     backgroundColor: "white",
     color: "black"
@@ -36,11 +45,12 @@ class TableFilters extends React.PureComponent {
     id: this.props.id,
     sku: this.props.sku,
     name: this.props.name,
+    storeId: this.props.storeId,
     category: this.props.category,
     department: this.props.department,
-    isCustom: this.props.isCustom,
     isKit: this.props.isKit,
-    isPart: this.props.isPart,
+    isCustom: this.props.isCustom,
+    isEnabled: this.props.isEnabled,
   };
 
   timer = null;
@@ -126,8 +136,8 @@ class TableFilters extends React.PureComponent {
               categories={this.props.categories}
               onChange={this.handleFilterChange}
               value={this.state.category}
-              id="categoryId"
-              name="categoryId"
+              id="category"
+              name="category"
               label="Catégorie"
               containerClass={classes.formControl}
             />
@@ -152,11 +162,66 @@ class TableFilters extends React.PureComponent {
               </Select>
             </FormControl>
 
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="input-department">Disponible dans...</InputLabel>
+              <Select
+                value={this.state.storeId}
+                onChange={this.handleFilterChange}
+                inputProps={{
+                  name: 'storeId',
+                  id: 'input-storeId'
+                }}>
+                <MenuItem value="">
+                  <em>Tous</em>
+                </MenuItem>
+                {this.props.stores.map((store, idx) => (
+                  <MenuItem key={idx} value={store.id}>{store.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <br/>
             <br/>
 
-            <FormControl component="fieldset">
+            <FormControl component="fieldset" className={classes.formControl}>
               <FormLabel component="legend">État du produit</FormLabel>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isEnabled === "1"}
+                      name="isEnabled"
+                      value="1"
+                      onChange={this.handleSwitchChange}
+                      classes={{
+                        switchBase: classes.colorSwitchBase,
+                        checked: classes.colorChecked,
+                        bar: classes.colorBar,
+                      }}
+                    />
+                  }
+                  label="Activé"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.state.isEnabled === "0"}
+                      name="isEnabled"
+                      value="0"
+                      color="secondary"
+                      onChange={this.handleSwitchChange}
+                    />
+                  }
+                  label="Désactivé"
+                />
+              </FormGroup>
+            </FormControl>
+
+            <br/><br/>
+
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Type de produit</FormLabel>
               <FormGroup>
                 <FormControlLabel
                   control={
@@ -184,12 +249,6 @@ class TableFilters extends React.PureComponent {
                   label="Sur Mesure"
                 />
               </FormGroup>
-            </FormControl>
-
-            <br/><br/>
-
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Type de produit</FormLabel>
               <FormGroup>
                 <FormControlLabel
                   control={
@@ -207,9 +266,9 @@ class TableFilters extends React.PureComponent {
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={this.state.isPart === "1"}
-                      name="isPart"
-                      value="1"
+                      checked={this.state.isKit === "0"}
+                      name="isKit"
+                      value="0"
                       color="primary"
                       onChange={this.handleSwitchChange}
                     />
@@ -228,14 +287,20 @@ class TableFilters extends React.PureComponent {
 TableFilters.propTypes = {
   categories: PropTypes.array.isRequired,
   departments: PropTypes.array.isRequired,
+  stores: PropTypes.array.isRequired,
   id: PropTypes.string,
   sku: PropTypes.string,
   name: PropTypes.string,
+  storeId: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   category: PropTypes.string,
   department: PropTypes.string,
-  isCustom: PropTypes.string,
   isKit: PropTypes.string,
   isPart: PropTypes.string,
+  isCustom: PropTypes.string,
+  isEnabled: PropTypes.string,
 };
 
 const mstp = state => {

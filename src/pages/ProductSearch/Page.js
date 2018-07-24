@@ -21,26 +21,25 @@ const styles = theme => ({
 });
 
 class ProductSearchPage extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isLoading: false,
-      categories: [],
-      departments: [],
-    };
-  }
+  state = {
+    isLoading: false,
+    categories: [],
+    departments: [],
+    stores: []
+  };
 
   componentDidMount() {
     const getCategories = () => ProductRepository.getProductCategories();
     const getDepartments = () => ProductRepository.getProductDepartments();
+    const getStores = () => ProductRepository.getStores();
 
-    Promise.all([getCategories(), getDepartments()]).then(data => {
-      const [categories, departments] = data;
+    Promise.all([getCategories(), getDepartments(), getStores()]).then(data => {
+      const [categories, departments, stores] = data;
 
       this.setState({
         categories: categories,
         departments: departments,
+        stores: stores,
       });
 
       this.props.dispatch(performSearch());
@@ -59,6 +58,7 @@ class ProductSearchPage extends Component {
               <TableFilters
                 categories={this.state.categories}
                 departments={this.state.departments}
+                stores={this.state.stores}
               />
             </Paper>
           </Grid>

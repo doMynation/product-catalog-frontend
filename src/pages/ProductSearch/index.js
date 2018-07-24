@@ -20,17 +20,18 @@ export const DELETE_ERROR = 'productSearch/DELETE_ERROR';
 
 export const duplicateProduct = productId => {
   return dispatch => {
-    dispatch({type: DELETE_START});
+    dispatch({type: DUPLICATE_START});
 
     // Delete the product
     ProductRepository.deleteProduct(productId)
       .then(resp => {
-        dispatch({type: DELETE_SUCCESS});
+        dispatch({type: DUPLICATE_SUCCESS});
         dispatch(performSearch());
       })
-      .catch(err => dispatch({type: DELETE_ERROR, message: err.message}));
+      .catch(err => dispatch({type: DUPLICATE_ERROR, message: err.message}));
   };
 }
+
 export const deleteProduct = productId => {
   return dispatch => {
     dispatch({type: DELETE_START});
@@ -39,10 +40,10 @@ export const deleteProduct = productId => {
     ProductRepository.deleteProduct(productId)
       .then(resp => {
         dispatch({type: DELETE_SUCCESS});
+        dispatch(openNotification(`Le produit ${productId} a été supprimé.`));
         dispatch(performSearch());
       })
       .catch(err => {
-        dispatch(openNotification(`Le produit ${productId} a été supprimé.`));
         dispatch({type: DELETE_ERROR, message: err.message})
       });
   };
@@ -142,11 +143,12 @@ export const initialState = {
       id: "",
       sku: "",
       name: "",
+      storeId: "",
       category: "",
       department: "",
       isKit: "",
       isCustom: "",
-      isPart: "",
+      isEnabled: "1",
     },
     sortField: "",
     sortOrder: "asc"

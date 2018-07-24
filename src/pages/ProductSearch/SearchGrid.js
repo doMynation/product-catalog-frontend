@@ -50,6 +50,8 @@ class SearchGrid extends React.PureComponent {
     return (
       <TableHead>
         <TableRow>
+          <TableCell padding="checkbox">{' '}</TableCell>
+
           <TableCell padding="checkbox">
             <TableSortLabel active={sortField === "id"} direction={sortOrder} onClick={() => sortBy('id')}>ID</TableSortLabel>
           </TableCell>

@@ -10,36 +10,62 @@ export const CHANGE_PAGE_SIZE = 'productSearch/CHANGE_PAGE_SIZE';
 export const SEARCH_START = 'productSearch/SEARCH_START';
 export const SEARCH_SUCCESS = 'productSearch/SEARCH_SUCCESS';
 
-export const DUPLICATE_START = 'productSearch/DUPLICATE_START';
-export const DUPLICATE_SUCCESS = 'productSearch/DUPLICATE_SUCCESS';
-export const DUPLICATE_ERROR = 'productSearch/DUPLICATE_ERROR';
+export const SELECT = 'productSearch/SELECT';
+export const SELECT_ALL = 'productSearch/SELECT_ALL';
+
+export const UPDATE_SUCCESS = 'productSearch/UPDATE_SUCCESS';
+export const BULK_UPDATE_SUCCESS = 'productSearch/BULK_UPDATE_SUCCESS';
 
 export const DELETE_START = 'productSearch/DELETE_START';
-export const DELETE_SUCCESS = 'productSearch/DELETE_SUCCESS';
 export const DELETE_ERROR = 'productSearch/DELETE_ERROR';
 
-export const duplicateProduct = productId => {
-  return dispatch => {
-    dispatch({type: DUPLICATE_START});
+export const BULK_DISABLE_START = 'productSearch/BULK_DISABLE_START';
+export const BULK_DISABLE_ERROR = 'productSearch/BULK_DISABLE_ERROR';
 
-    // Delete the product
-    ProductRepository.deleteProduct(productId)
+export const selectAll = () => ({
+  type: SELECT_ALL,
+});
+
+export const selectProduct = index => ({
+  type: SELECT,
+  index
+});
+
+export const bulkDisableProducts = () => {
+  return (dispatch, getState) => {
+    const selectedProductIndices = getState().productSearch.selected;
+
+    // Do nothing when no product is selected
+    if (selectedProductIndices.length === 0) {
+      return;
+    }
+
+    // Get the list of matching products
+    const products = getState().productSearch.products;
+    const selectedProductIds = selectedProductIndices.map(index => products[index].id);
+
+    dispatch({type: BULK_DISABLE_START});
+
+    ProductRepository.disableProducts(selectedProductIds)
       .then(resp => {
-        dispatch({type: DUPLICATE_SUCCESS});
+        dispatch({type: BULK_UPDATE_SUCCESS, productIds: selectedProductIds});
+        dispatch(openNotification(`Les produits ${selectedProductIds.join(", ")} ont été supprimés.`));
         dispatch(performSearch());
       })
-      .catch(err => dispatch({type: DUPLICATE_ERROR, message: err.message}));
+      .catch(err => {
+        dispatch({type: BULK_DISABLE_ERROR, message: err.message});
+      });
   };
-}
+};
 
 export const deleteProduct = productId => {
   return dispatch => {
     dispatch({type: DELETE_START});
 
     // Delete the product
-    ProductRepository.deleteProduct(productId)
+    ProductRepository.disableProduct(productId)
       .then(resp => {
-        dispatch({type: DELETE_SUCCESS});
+        dispatch({type: UPDATE_SUCCESS, productId});
         dispatch(openNotification(`Le produit ${productId} a été supprimé.`));
         dispatch(performSearch());
       })
@@ -47,15 +73,15 @@ export const deleteProduct = productId => {
         dispatch({type: DELETE_ERROR, message: err.message})
       });
   };
-}
+};
 
 export const performSearch = () => {
   return (dispatch, getState) => {
     const state = getState().productSearch.search;
     const offset = state.page * state.pageSize;
 
-    var sortField = null;
-    var sortDescending = null;
+    let sortField = null;
+    let sortDescending = null;
 
     if (state.sortField !== null) {
       sortField = state.sortField;
@@ -154,11 +180,30 @@ export const initialState = {
     sortOrder: "asc"
   },
   products: [],
+  selected: [],
+  recentlyUpdated: [],
   productsCount: 0,
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SELECT_ALL:
+      const isAllSelected = state.products.length === state.selected.length;
+
+      return {
+        ...state,
+        selected: isAllSelected ? [] : state.products.map((product, idx) => idx)
+      };
+    case SELECT:
+      const isSelected = state.selected.indexOf(action.index) !== -1;
+      const newSelected = isSelected ?
+        state.selected.filter(idx => idx !== action.index) :
+        state.selected.concat([action.index]);
+
+      return {
+        ...state,
+        selected: newSelected
+      };
     case CHANGE_PAGE_SIZE:
       return {
         ...state,
@@ -210,9 +255,20 @@ export default (state = initialState, action) => {
     case SEARCH_SUCCESS:
       return {
         ...state,
+        selected: [],
         isLoading: false,
         products: action.products,
         productsCount: action.productsCount,
+      };
+    case UPDATE_SUCCESS:
+      return {
+        ...state,
+        recentlyUpdated: state.recentlyUpdated.concat([action.productId])
+      };
+    case BULK_UPDATE_SUCCESS:
+      return {
+        ...state,
+        recentlyUpdated: state.recentlyUpdated.concat(action.productIds)
       };
     default:
       return state;

@@ -16,7 +16,12 @@ import LinearProgress from "@material-ui/core/es/LinearProgress/LinearProgress";
 import SearchResult from "./SearchResult";
 import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
-import {changePage, changePageSize, resetSearch, sortBy} from "./index";
+import {
+  bulkDisableProducts, changePage, changePageSize, resetSearch, selectAll,
+  sortBy
+} from "./index";
+import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
+import BulkActionMenu from "./BulkActionMenu";
 
 const styles = theme => ({
   row: theme.table.rows.striped
@@ -24,19 +29,29 @@ const styles = theme => ({
 
 class SearchGrid extends React.PureComponent {
   render() {
+    const {data, isLoading, selected, recentlyUpdated} = this.props;
+
     return (
       <React.Fragment>
-        {this.props.isLoading ? <LinearProgress/> : ''}
+        {isLoading ? <LinearProgress/> : ''}
 
         <Table>
           {this.renderHead()}
           <TableBody>
-            {this.props.data.map((product, idx) =>
-              <SearchResult
-                product={product}
-                key={'product_' + idx}
-              />
-            )}
+            {data.map((product, idx) => {
+              const isSelected = selected.indexOf(idx) !== -1;
+              const isRecentlyUpdated = recentlyUpdated.indexOf(product.id) !== -1;
+
+              return (
+                <SearchResult
+                  isSelected={isSelected}
+                  isRecentlyUpdated={isRecentlyUpdated}
+                  product={product}
+                  productIndex={idx}
+                  key={'product_' + idx}
+                />
+              );
+            })}
           </TableBody>
         </Table>
         {this.renderFooter()}
@@ -45,11 +60,20 @@ class SearchGrid extends React.PureComponent {
   }
 
   renderHead = () => {
-    const {sortBy, sortField, sortOrder} = this.props;
+    const {sortBy, sortField, sortOrder, selectAll, selected, handleBulkDisable} = this.props;
+    const isAllSelected = this.props.data.length === selected.length;
+    const hasSelections = selected.length > 0;
 
     return (
       <TableHead>
         <TableRow>
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={isAllSelected}
+              onChange={() => selectAll()}
+            />
+          </TableCell>
+
           <TableCell padding="checkbox">{' '}</TableCell>
 
           <TableCell padding="checkbox">
@@ -74,7 +98,12 @@ class SearchGrid extends React.PureComponent {
             <TableSortLabel active={sortField === "price"} direction={sortOrder} onClick={() => sortBy('price')}>Prix</TableSortLabel>
           </TableCell>
 
-          <TableCell padding="checkbox">{''}</TableCell>
+          <TableCell padding="checkbox">
+            {hasSelections &&
+            <BulkActionMenu
+              onDisable={() => handleBulkDisable()}
+            />}
+          </TableCell>
         </TableRow>
       </TableHead>
     );
@@ -117,6 +146,8 @@ const mstp = state => ({productSearch}) => {
   const search = productSearch.search;
 
   return {
+    selected: productSearch.selected,
+    recentlyUpdated: productSearch.recentlyUpdated,
     sortField: search.sortField,
     sortOrder: search.sortOrder,
     page: search.page,
@@ -128,7 +159,9 @@ const mdtp = dispatch => ({
   resetSearch: () => dispatch(resetSearch()),
   sortBy: field => dispatch(sortBy(field)),
   changePage: pageNumber => dispatch(changePage(pageNumber)),
-  changePageSize: size => dispatch(changePageSize(size))
+  changePageSize: size => dispatch(changePageSize(size)),
+  selectAll: () => dispatch(selectAll()),
+  handleBulkDisable: () => dispatch(bulkDisableProducts())
 });
 
 export default compose(

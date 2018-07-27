@@ -12,9 +12,19 @@ import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import Menu from "@material-ui/core/es/Menu/Menu";
 import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
-import {deleteProduct} from "./index";
+import {deleteProduct, selectProduct} from "./index";
+import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 
 const styles = theme => ({
+  recentlyUpdatedContainer: {
+    position: 'relative',
+  },
+  recentlyUpdated: {
+    position: 'absolute',
+    top: 3,
+    left: 3,
+    fontSize: 10,
+  },
   row: theme.table.rows.striped,
   cellDisabled: {
     textDecoration: 'line-through'
@@ -53,15 +63,24 @@ class SearchResult extends React.Component {
   }
 
   render() {
-    const {classes, product} = this.props;
+    const {classes, product, selectProduct, isSelected, isRecentlyUpdated} = this.props;
     const cellClass = product.isEnabled ? '' : classes.cellDisabled;
 
     return (
       <TableRow className={classes.row}>
+        <TableCell style={{textAlign: 'center'}} className={classes.recentlyUpdatedContainer}>
+          {isRecentlyUpdated &&
+          <Tooltip title="Récemment modifié"><Icon color="secondary" className={classes.recentlyUpdated}>edit</Icon></Tooltip>}
+          <Checkbox
+            checked={isSelected}
+            onChange={() => selectProduct(this.props.productIndex)}
+          />
+        </TableCell>
         <TableCell style={{textAlign: 'center'}}>
           <div style={{width: '50px'}}>
             {!product.isCustom && <Tooltip title="Produit standard"><Icon>star_rate</Icon></Tooltip>}
-            {product.metadata.isKit === "1" && <Tooltip title="Ensemble de produits"><Icon>vertical_split</Icon></Tooltip>}
+            {product.metadata.isKit === "1" &&
+            <Tooltip title="Ensemble de produits"><Icon>vertical_split</Icon></Tooltip>}
           </div>
         </TableCell>
         <TableCell style={{textAlign: 'center'}} className={cellClass}>
@@ -116,6 +135,7 @@ SearchResult.propTypes = {
 
 const mstp = state => ({});
 const mdtp = dispatch => ({
+  selectProduct: index => dispatch(selectProduct(index)),
   deleteProduct: productId => dispatch(deleteProduct(productId))
 });
 

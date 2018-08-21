@@ -22,9 +22,16 @@ import {
 } from "./index";
 import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 import BulkActionMenu from "./BulkActionMenu";
+import Hidden from "@material-ui/core/es/Hidden/Hidden";
 
 const styles = theme => ({
-  row: theme.table.rows.striped
+  row: theme.table.rows.striped,
+  cell: {
+    padding: theme.spacing.unit
+  },
+  resetButton: {
+    paddingLeft: theme.spacing.unit
+  }
 });
 
 class SearchGrid extends React.PureComponent {
@@ -60,45 +67,52 @@ class SearchGrid extends React.PureComponent {
   }
 
   renderHead = () => {
-    const {sortBy, sortField, sortOrder, selectAll, selected, handleBulkDisable} = this.props;
+    const {classes, sortBy, sortField, sortOrder, selectAll, selected, handleBulkDisable} = this.props;
     const isAllSelected = this.props.data.length === selected.length;
     const hasSelections = selected.length > 0;
 
     return (
       <TableHead>
         <TableRow>
-          <TableCell padding="checkbox">
+          <TableCell className={classes.cell}>
             <Checkbox
               checked={isAllSelected}
               onChange={() => selectAll()}
             />
           </TableCell>
 
-          <TableCell padding="checkbox">{' '}</TableCell>
+          <Hidden smDown>
+            <TableCell className={classes.cell}>{' '}</TableCell>
+          </Hidden>
 
-          <TableCell padding="checkbox">
-            <TableSortLabel active={sortField === "id"} direction={sortOrder} onClick={() => sortBy('id')}>ID</TableSortLabel>
-          </TableCell>
+          <Hidden only="xs">
+            <TableCell className={classes.cell}>
+              <TableSortLabel active={sortField === "id"} direction={sortOrder} onClick={() => sortBy('id')}>ID</TableSortLabel>
+            </TableCell>
+          </Hidden>
 
-          <TableCell padding="checkbox">
-            <TableSortLabel active={sortField === "category"} direction={sortOrder} onClick={() => sortBy('category')}>
-              Catégorie/Département
-            </TableSortLabel>
-          </TableCell>
+          <Hidden only="xs">
+            <TableCell className={classes.cell}>
+              <TableSortLabel active={sortField === "category"} direction={sortOrder} onClick={() => sortBy('category')}>
+                Catégorie/<br/>Département
+              </TableSortLabel>
+            </TableCell>
+          </Hidden>
 
-          <TableCell padding="checkbox">
+          <TableCell className={classes.cell}>
             <TableSortLabel active={sortField === "sku"} direction={sortOrder} onClick={() => sortBy('sku')}>SKU</TableSortLabel>
           </TableCell>
 
-          <TableCell padding="checkbox">
-            <TableSortLabel active={sortField === "name"} direction={sortOrder} onClick={() => sortBy('name')}>Nom</TableSortLabel>
-          </TableCell>
+          <Hidden smDown>
+            <TableCell className={classes.cell}>
+              <TableSortLabel active={sortField === "name"} direction={sortOrder} onClick={() => sortBy('name')}>Nom</TableSortLabel>
+            </TableCell>
+            <TableCell className={classes.cell}>
+              <TableSortLabel active={sortField === "price"} direction={sortOrder} onClick={() => sortBy('price')}>Prix</TableSortLabel>
+            </TableCell>
+          </Hidden>
 
-          <TableCell padding="checkbox">
-            <TableSortLabel active={sortField === "price"} direction={sortOrder} onClick={() => sortBy('price')}>Prix</TableSortLabel>
-          </TableCell>
-
-          <TableCell padding="checkbox">
+          <TableCell className={classes.cell}>
             {hasSelections &&
             <BulkActionMenu
               onDisable={() => handleBulkDisable()}
@@ -110,11 +124,11 @@ class SearchGrid extends React.PureComponent {
   }
 
   renderFooter = () => {
-    const {rowsCount, page, pageSize, resetSearch, changePage, changePageSize} = this.props;
+    const {classes, rowsCount, page, pageSize, resetSearch, changePage, changePageSize} = this.props;
 
     return (
       <Grid container>
-        <Grid item xs={2}>
+        <Grid item xs={2} className={classes.resetButton}>
           <Tooltip title="Réinitialiser" placement="right">
             <IconButton onClick={resetSearch}>
               <Icon>settings_backup_restore</Icon>

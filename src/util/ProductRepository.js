@@ -19,11 +19,11 @@ class ProductRepository {
       .set(this._prepHeaders());
   }
 
-  static deleteProduct(productId) {
-    const url = `${ProductRepository.baseUrl}/admin/products/${productId}`;
+  static cloneProduct(productId) {
+    const url = `${ProductRepository.baseUrl}/admin/products/${productId}/clone`;
 
     return request
-      .delete(url)
+      .post(url)
       .set(this._prepHeaders());
   }
 

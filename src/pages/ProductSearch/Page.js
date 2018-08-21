@@ -10,13 +10,14 @@ import TableFilters from "./TableFilters";
 import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
 import {performSearch} from "./index";
+import Hidden from "@material-ui/core/es/Hidden/Hidden";
 
 const styles = theme => ({
   root: {
-    padding: 20
+    padding: theme.spacing.unit * 3
   },
   layout: {
-    marginTop: 10
+    marginTop: theme.spacing.unit
   }
 });
 
@@ -51,17 +52,19 @@ class ProductSearchPage extends Component {
 
     return (
       <div className={classes.root}>
-        <PageHeader text="Rechercher un produit"></PageHeader>
+        <PageHeader text="Trouver un produit"></PageHeader>
         <Grid container spacing={16} className={classes.layout}>
-          <Grid item xs={12} md={2} lg={2}>
-            <Paper elevation={8}>
-              <TableFilters
-                categories={this.state.categories}
-                departments={this.state.departments}
-                stores={this.state.stores}
-              />
-            </Paper>
-          </Grid>
+          <Hidden smDown>
+            <Grid item xs={12} md={2} lg={2}>
+              <Paper elevation={8}>
+                <TableFilters
+                  categories={this.state.categories}
+                  departments={this.state.departments}
+                  stores={this.state.stores}
+                />
+              </Paper>
+            </Grid>
+          </Hidden>
 
           <Grid item xs={12} md={10} lg={10}>
             <Paper elevation={8}>

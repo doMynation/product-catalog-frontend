@@ -9,9 +9,13 @@ import './style.css';
 import compose from "redux/src/compose";
 import withStyles from "@material-ui/core/es/styles/withStyles";
 
-const styles = theme => ({});
+const styles = theme => ({
+  icon: {
+    paddingLeft: theme.spacing.unit
+  }
+});
 
-const Home = ({handleClick, isMenuOpen}) => (
+const Home = ({handleClick, isMenuOpen, classes}) => (
   <Paper className="paper">
     <Typography variant="display2" color="inherit">
       Module d'Inventaire
@@ -24,7 +28,7 @@ const Home = ({handleClick, isMenuOpen}) => (
 
     <Button size="large" color="primary" variant="raised" onClick={handleClick}>
       Commencez ici
-      <Icon>send</Icon>
+      <Icon className={classes.icon}>send</Icon>
     </Button>
   </Paper>
 );

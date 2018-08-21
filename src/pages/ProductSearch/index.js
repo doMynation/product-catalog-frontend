@@ -16,6 +16,9 @@ export const SELECT_ALL = 'productSearch/SELECT_ALL';
 export const UPDATE_SUCCESS = 'productSearch/UPDATE_SUCCESS';
 export const BULK_UPDATE_SUCCESS = 'productSearch/BULK_UPDATE_SUCCESS';
 
+export const CLONE_START = 'productSearch/CLONE_START';
+export const CLONE_ERROR = 'productSearch/CLONE_ERROR';
+
 export const DELETE_START = 'productSearch/DELETE_START';
 export const DELETE_ERROR = 'productSearch/DELETE_ERROR';
 
@@ -30,6 +33,21 @@ export const selectProduct = index => ({
   type: SELECT,
   index
 });
+
+export const cloneProduct = productId => {
+  return dispatch => {
+    dispatch({type: CLONE_START});
+
+    ProductRepository.cloneProduct(productId)
+      .then(resp => {
+        dispatch(openNotification(`Le produit [${resp.body.sku}] a été créé avec succès.`));
+        dispatch(performSearch());
+      })
+      .catch(err => {
+        dispatch({type: CLONE_ERROR, message: err.message});
+      });
+  };
+}
 
 export const bulkDisableProducts = () => {
   return (dispatch, getState) => {
@@ -106,8 +124,11 @@ export const performSearch = () => {
         dispatch(receiveResults(searchResult.results, searchResult.totalCount));
       })
       .catch(err => {
+        console.log("hmm what", err.response);
         if (err.timeout) {
           console.log("handle timeout");
+        } else if (!("response" in err)) {
+          dispatch(showUnauthorized());
         } else if (err.response.unauthorized) {
           dispatch(showUnauthorized());
         } else if (err.response.forbidden) {

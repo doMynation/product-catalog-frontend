@@ -8,9 +8,18 @@ import Header from "./layout/Header";
 import {withStyles} from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Notification from "./shared/Notification";
+import BgImage from './layout/images/dark-material-bg.jpg';
 
 const styles = theme => ({
-  root: {},
+  root: {
+    height: '100%',
+    flexWrap: 'nowrap',
+    backgroundImage: `url(${BgImage})`,
+    backgroundSize: 'cover',
+  },
+  content: {
+    flexGrow: 1,
+  }
 });
 
 class App extends Component {
@@ -18,22 +27,17 @@ class App extends Component {
     const {classes} = this.props;
 
     return (
-      <Grid container className={classes.root}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Menu/>
-            <Notification/>
-          </Grid>
+      <Grid container direction="column" className={classes.root}>
+        <Grid item>
+          <Header/>
+          <Menu/>
+          <Notification/>
+        </Grid>
 
-          <Grid item xs={12}>
-            <Header/>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Route exact path="/" component={HomePage}/>
-            <Route exact path="/products" component={ProductSearchPage}/>
-            <Route path="/products/:productId" component={ProductEditPage}/>
-          </Grid>
+        <Grid container className={classes.content}>
+          <Route exact path="/" component={HomePage}/>
+          <Route exact path="/products" component={ProductSearchPage}/>
+          <Route path="/products/:productId" component={ProductEditPage}/>
         </Grid>
       </Grid>
     );

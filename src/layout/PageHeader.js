@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/es/Typography/Typography";
 import withStyles from "@material-ui/core/es/styles/withStyles";
-import PageHeaderBg from './page-header.png';
 import Icon from "@material-ui/core/es/Icon/Icon";
 
 const styles = theme => ({
@@ -11,8 +10,6 @@ const styles = theme => ({
     alignItems: 'center',
     height: 100,
     minHeight: 100,
-    backgroundImage: `url(${PageHeaderBg})`,
-    backgroundColor: theme.colors.dark,
     padding: '2.4rem',
   },
   icon: {

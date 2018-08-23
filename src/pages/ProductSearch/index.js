@@ -67,7 +67,7 @@ export const bulkDisableProducts = () => {
     ProductRepository.disableProducts(selectedProductIds)
       .then(resp => {
         dispatch({type: BULK_UPDATE_SUCCESS, productIds: selectedProductIds});
-        dispatch(openNotification(`Les produits ${selectedProductIds.join(", ")} ont été supprimés.`));
+        dispatch(openNotification(`Les produits ${selectedProductIds.join(", ")} ont été désactivés.`));
         dispatch(performSearch());
       })
       .catch(err => {
@@ -84,7 +84,7 @@ export const deleteProduct = productId => {
     ProductRepository.disableProduct(productId)
       .then(resp => {
         dispatch({type: UPDATE_SUCCESS, productId});
-        dispatch(openNotification(`Le produit ${productId} a été supprimé.`));
+        dispatch(openNotification(`Le produit ${productId} a été désactivé.`));
         dispatch(performSearch());
       })
       .catch(err => {

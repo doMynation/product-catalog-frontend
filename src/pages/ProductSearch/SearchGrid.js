@@ -82,7 +82,12 @@ class SearchGrid extends React.PureComponent {
           </TableCell>
 
           <Hidden smDown>
-            <TableCell className={classes.cell}>{' '}</TableCell>
+            <TableCell className={classes.cell}>
+              {hasSelections &&
+              <BulkActionMenu
+                onDisable={() => handleBulkDisable()}
+              />}
+            </TableCell>
           </Hidden>
 
           <Hidden only="xs">
@@ -112,12 +117,7 @@ class SearchGrid extends React.PureComponent {
             </TableCell>
           </Hidden>
 
-          <TableCell className={classes.cell}>
-            {hasSelections &&
-            <BulkActionMenu
-              onDisable={() => handleBulkDisable()}
-            />}
-          </TableCell>
+          <TableCell className={classes.cell}>{' '}</TableCell>
         </TableRow>
       </TableHead>
     );

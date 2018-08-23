@@ -14,7 +14,9 @@ import Hidden from "@material-ui/core/es/Hidden/Hidden";
 
 const styles = theme => ({
   root: {
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing.unit * 3,
+    // width: '100%',
+    // display: 'flex',
   },
   layout: {
     marginTop: theme.spacing.unit
@@ -53,7 +55,8 @@ class ProductSearchPage extends Component {
     return (
       <div className={classes.root}>
         <PageHeader text="Trouver un produit"></PageHeader>
-        <Grid container spacing={16} className={classes.layout}>
+
+        <Grid container className={classes.layout} spacing={16}>
           <Hidden smDown>
             <Grid item xs={12} md={2} lg={2}>
               <Paper elevation={8}>

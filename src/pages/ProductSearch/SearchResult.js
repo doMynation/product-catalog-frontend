@@ -57,7 +57,7 @@ class SearchResult extends React.Component {
   handleDelete = productId => {
     this.setState({moreAnchor: null});
 
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit?")) {
+    if (!window.confirm("Êtes-vous sûr de vouloir désactiver ce produit?")) {
       return;
     }
 
@@ -144,7 +144,7 @@ class SearchResult extends React.Component {
 
             <MenuItem onClick={() => this.handleDelete(product.id)}>
               <ListItemIcon><Icon>delete</Icon></ListItemIcon>
-              <ListItemText>Supprimer</ListItemText>
+              <ListItemText>Désactiver</ListItemText>
             </MenuItem>
           </Menu>
         </TableCell>

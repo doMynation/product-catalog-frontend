@@ -1,11 +1,15 @@
 import ProductRepository from "../../util/ProductRepository";
 import {openNotification, showUnauthorized} from "../../shared/index";
+import initialState from './initialState';
 
 export const FILTER = 'productSearch/FILTER';
 export const RESET = 'productSearch/RESET';
 export const SORT = 'productSearch/SORT';
 export const CHANGE_PAGE = 'productSearch/CHANGE_PAGE';
 export const CHANGE_PAGE_SIZE = 'productSearch/CHANGE_PAGE_SIZE';
+
+export const BULK_ATTRIBUTE_ADD_OPEN = 'productSearch/bulkAttributeAdd/OPEN';
+export const BULK_ATTRIBUTE_ADD_CLOSE = 'productSearch/bulkAttributeAdd/CLOSE';
 
 export const SEARCH_START = 'productSearch/SEARCH_START';
 export const SEARCH_SUCCESS = 'productSearch/SEARCH_SUCCESS';
@@ -14,16 +18,22 @@ export const SELECT = 'productSearch/SELECT';
 export const SELECT_ALL = 'productSearch/SELECT_ALL';
 
 export const UPDATE_SUCCESS = 'productSearch/UPDATE_SUCCESS';
-export const BULK_UPDATE_SUCCESS = 'productSearch/BULK_UPDATE_SUCCESS';
+export const UPDATE_ERROR = 'productSearch/UPDATE_ERROR';
 
 export const CLONE_START = 'productSearch/CLONE_START';
 export const CLONE_ERROR = 'productSearch/CLONE_ERROR';
 
-export const DELETE_START = 'productSearch/DELETE_START';
-export const DELETE_ERROR = 'productSearch/DELETE_ERROR';
+export const BULK_ACTION_START = 'productSearch/BULK_ACTION_START';
+export const BULK_UPDATE_SUCCESS = 'productSearch/BULK_UPDATE_SUCCESS';
+export const BULK_ACTION_ERROR = 'productSearch/BULK_ACTION_ERROR';
 
-export const BULK_DISABLE_START = 'productSearch/BULK_DISABLE_START';
-export const BULK_DISABLE_ERROR = 'productSearch/BULK_DISABLE_ERROR';
+export const openBulkAttributeAddDialog = () => ({
+  type: BULK_ATTRIBUTE_ADD_OPEN
+});
+
+export const closeBulkAttributeAddDialog = () => ({
+  type: BULK_ATTRIBUTE_ADD_CLOSE
+});
 
 export const selectAll = () => ({
   type: SELECT_ALL,
@@ -49,6 +59,33 @@ export const cloneProduct = productId => {
   };
 }
 
+export const bulkEnableProduct = () => {
+  return (dispatch, getState) => {
+    const selectedProductIndices = getState().productSearch.selected;
+
+    // Do nothing when no product is selected
+    if (selectedProductIndices.length === 0) {
+      return;
+    }
+
+    // Get the list of matching products
+    const products = getState().productSearch.products;
+    const selectedProductIds = selectedProductIndices.map(index => products[index].id);
+
+    dispatch({type: BULK_ACTION_START});
+
+    ProductRepository.enableProducts(selectedProductIds)
+      .then(resp => {
+        dispatch({type: BULK_UPDATE_SUCCESS, productIds: selectedProductIds});
+        dispatch(openNotification(`Les produits ${selectedProductIds.join(", ")} ont été ré-activés.`));
+        dispatch(performSearch());
+      })
+      .catch(err => {
+        dispatch({type: BULK_ACTION_ERROR, message: err.message});
+      });
+  };
+};
+
 export const bulkDisableProducts = () => {
   return (dispatch, getState) => {
     const selectedProductIndices = getState().productSearch.selected;
@@ -62,7 +99,7 @@ export const bulkDisableProducts = () => {
     const products = getState().productSearch.products;
     const selectedProductIds = selectedProductIndices.map(index => products[index].id);
 
-    dispatch({type: BULK_DISABLE_START});
+    dispatch({type: BULK_ACTION_START});
 
     ProductRepository.disableProducts(selectedProductIds)
       .then(resp => {
@@ -71,16 +108,27 @@ export const bulkDisableProducts = () => {
         dispatch(performSearch());
       })
       .catch(err => {
-        dispatch({type: BULK_DISABLE_ERROR, message: err.message});
+        dispatch({type: BULK_ACTION_ERROR, message: err.message});
       });
   };
 };
 
-export const deleteProduct = productId => {
+export const enableProduct = productId => {
   return dispatch => {
-    dispatch({type: DELETE_START});
+    ProductRepository.enableProduct(productId)
+      .then(resp => {
+        dispatch({type: UPDATE_SUCCESS, productId});
+        dispatch(openNotification(`Le produit ${productId} a été ré-activé.`));
+        dispatch(performSearch());
+      })
+      .catch(err => {
+        dispatch({type: UPDATE_ERROR, message: err.message})
+      });
+  };
+};
 
-    // Delete the product
+export const disableProduct = productId => {
+  return dispatch => {
     ProductRepository.disableProduct(productId)
       .then(resp => {
         dispatch({type: UPDATE_SUCCESS, productId});
@@ -88,7 +136,7 @@ export const deleteProduct = productId => {
         dispatch(performSearch());
       })
       .catch(err => {
-        dispatch({type: DELETE_ERROR, message: err.message})
+        dispatch({type: UPDATE_ERROR, message: err.message})
       });
   };
 };
@@ -179,33 +227,6 @@ export const changePageSize = size => {
   };
 };
 
-export const initialState = {
-  isAdvancedSearchOpen: false,
-  isLoading: false,
-  search: {
-    count: 0,
-    page: 0,
-    pageSize: 25,
-    filters: {
-      id: "",
-      sku: "",
-      name: "",
-      storeId: "",
-      category: "",
-      department: "",
-      isKit: "",
-      isCustom: "",
-      isEnabled: "1",
-    },
-    sortField: "",
-    sortOrder: "asc"
-  },
-  products: [],
-  selected: [],
-  recentlyUpdated: [],
-  productsCount: 0,
-};
-
 export default (state = initialState, action) => {
   switch (action.type) {
     case SELECT_ALL:
@@ -290,6 +311,22 @@ export default (state = initialState, action) => {
       return {
         ...state,
         recentlyUpdated: state.recentlyUpdated.concat(action.productIds)
+      };
+    case BULK_ATTRIBUTE_ADD_OPEN:
+      return {
+        ...state,
+        bulkAttributeAdd: {
+          ...state.bulkAttributeAdd,
+          isOpen: true
+        }
+      };
+    case BULK_ATTRIBUTE_ADD_CLOSE:
+      return {
+        ...state,
+        bulkAttributeAdd: {
+          ...state.bulkAttributeAdd,
+          isOpen: false
+        }
       };
     default:
       return state;

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Icon from "@material-ui/core/es/Icon/Icon";
-import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
@@ -24,7 +23,17 @@ class BulkActionMenu extends React.Component {
     this.setState({anchorEl: null});
   }
 
-  handleDisableClick = () => {
+  handleEnable = () => {
+    this.setState({anchorEl: null});
+
+    if (!window.confirm("Êtes-vous sûr de vouloir re-activer tous les produits sélectionnées?")) {
+      return;
+    }
+
+    this.props.onEnable();
+  }
+
+  handleDisable = () => {
     this.setState({anchorEl: null});
 
     if (!window.confirm("Êtes-vous sûr de vouloir désactiver tous les produits sélectionnées?")) {
@@ -32,6 +41,12 @@ class BulkActionMenu extends React.Component {
     }
 
     this.props.onDisable();
+  }
+
+  handleAttributeAdd = () => {
+    this.setState({anchorEl: null});
+
+    this.props.onAttributeAdd();
   }
 
   render() {
@@ -47,9 +62,19 @@ class BulkActionMenu extends React.Component {
           open={Boolean(this.state.anchorEl)}
           onClose={this.handleClose}
         >
-          <MenuItem onClick={this.handleDisableClick}>
+          <MenuItem onClick={this.handleEnable}>
+            <ListItemIcon><Icon>restore_from_trash</Icon></ListItemIcon>
+            <ListItemText>Activer</ListItemText>
+          </MenuItem>
+
+          <MenuItem onClick={this.handleDisable}>
             <ListItemIcon><Icon>delete</Icon></ListItemIcon>
             <ListItemText>Désactiver</ListItemText>
+          </MenuItem>
+
+          <MenuItem onClick={this.handleAttributeAdd}>
+            <ListItemIcon><Icon>playlist_add</Icon></ListItemIcon>
+            <ListItemText>Ajouter un attribut</ListItemText>
           </MenuItem>
         </Menu>
       </React.Fragment>
@@ -58,7 +83,9 @@ class BulkActionMenu extends React.Component {
 }
 
 BulkActionMenu.propTypes = {
-  onDisable: PropTypes.func.isRequired
+  onEnable: PropTypes.func.isRequired,
+  onDisable: PropTypes.func.isRequired,
+  onAttributeAdd: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(BulkActionMenu);

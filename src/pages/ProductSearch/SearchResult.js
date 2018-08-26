@@ -10,9 +10,6 @@ import Link from "react-router-dom/es/Link";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import Menu from "@material-ui/core/es/Menu/Menu";
-import connect from "react-redux/es/connect/connect";
-import compose from "redux/src/compose";
-import {cloneProduct, deleteProduct, selectProduct} from "./index";
 import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
@@ -54,20 +51,26 @@ class SearchResult extends React.Component {
     this.setState({moreAnchor: event.currentTarget});
   }
 
-  handleDelete = productId => {
+  handleEnable = productId => {
+    this.setState({moreAnchor: null});
+
+    this.props.onEnable(productId)
+  }
+
+  handleDisable = productId => {
     this.setState({moreAnchor: null});
 
     if (!window.confirm("Êtes-vous sûr de vouloir désactiver ce produit?")) {
       return;
     }
 
-    this.props.deleteProduct(productId)
+    this.props.onDisable(productId)
   }
 
   handleClone = productId => {
     this.setState({moreAnchor: null});
 
-    this.props.cloneProduct(productId)
+    this.props.onClone(productId)
   }
 
   handleClose = () => {
@@ -75,7 +78,7 @@ class SearchResult extends React.Component {
   }
 
   render() {
-    const {classes, product, selectProduct, isSelected, isRecentlyUpdated} = this.props;
+    const {classes, product, isSelected, isRecentlyUpdated, onSelect} = this.props;
     const cellClass = product.isEnabled ? classes.cell : classes.cellDisabled;
 
     return (
@@ -85,7 +88,7 @@ class SearchResult extends React.Component {
           <Tooltip title="Récemment modifié"><Icon color="secondary" className={classes.recentlyUpdated}>edit</Icon></Tooltip>}
           <Checkbox
             checked={isSelected}
-            onChange={() => selectProduct(this.props.productIndex)}
+            onChange={() => onSelect(this.props.productIndex)}
           />
         </TableCell>
 
@@ -139,13 +142,19 @@ class SearchResult extends React.Component {
           >
             <MenuItem onClick={() => this.handleClone(product.id)}>
               <ListItemIcon><Icon>control_point_duplicate</Icon></ListItemIcon>
-              <ListItemText>Copier</ListItemText>
+              <ListItemText disableTypography>Copier</ListItemText>
             </MenuItem>
 
-            <MenuItem onClick={() => this.handleDelete(product.id)}>
-              <ListItemIcon><Icon>delete</Icon></ListItemIcon>
-              <ListItemText>Désactiver</ListItemText>
-            </MenuItem>
+            {product.isEnabled ?
+              <MenuItem onClick={() => this.handleDisable(product.id)}>
+                <ListItemIcon><Icon>delete</Icon></ListItemIcon>
+                <ListItemText>Désactiver</ListItemText>
+              </MenuItem> :
+              <MenuItem onClick={() => this.handleEnable(product.id)}>
+                <ListItemIcon><Icon>restore_from_trash</Icon></ListItemIcon>
+                <ListItemText>Activer</ListItemText>
+              </MenuItem>
+            }
           </Menu>
         </TableCell>
       </TableRow>
@@ -155,18 +164,11 @@ class SearchResult extends React.Component {
 
 SearchResult.propTypes = {
   product: PropTypes.object.isRequired,
-  deleteProduct: PropTypes.func.isRequired
+  onSelect: PropTypes.func.isRequired,
+  onEnable: PropTypes.func.isRequired,
+  onDisable: PropTypes.func.isRequired,
+  onClone: PropTypes.func.isRequired,
 };
 
-const mstp = state => ({});
-const mdtp = dispatch => ({
-  selectProduct: index => dispatch(selectProduct(index)),
-  deleteProduct: productId => dispatch(deleteProduct(productId)),
-  cloneProduct: productId => dispatch(cloneProduct(productId))
-});
-
-export default compose(
-  withStyles(styles),
-  connect(mstp, mdtp)
-)(SearchResult);
+export default withStyles(styles)(SearchResult);
 

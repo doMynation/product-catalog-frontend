@@ -10,7 +10,7 @@ const styles = theme => ({
     alignItems: 'center',
     height: 100,
     minHeight: 100,
-    padding: '2.4rem',
+    padding: theme.spacing.unit
   },
   icon: {
     color: "white",

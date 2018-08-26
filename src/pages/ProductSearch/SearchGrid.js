@@ -17,7 +17,10 @@ import SearchResult from "./SearchResult";
 import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
 import {
-  bulkDisableProducts, changePage, changePageSize, resetSearch, selectAll,
+  bulkDisableProducts, bulkEnableProduct, changePage, changePageSize, cloneProduct, disableProduct, enableProduct,
+  openBulkAttributeAddDialog,
+  resetSearch,
+  selectAll, selectProduct,
   sortBy
 } from "./index";
 import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
@@ -36,7 +39,7 @@ const styles = theme => ({
 
 class SearchGrid extends React.PureComponent {
   render() {
-    const {data, isLoading, selected, recentlyUpdated} = this.props;
+    const {data, isLoading, selected, recentlyUpdated, selectProduct, enableProduct, disableProduct, cloneProduct} = this.props;
 
     return (
       <React.Fragment>
@@ -56,6 +59,10 @@ class SearchGrid extends React.PureComponent {
                   product={product}
                   productIndex={idx}
                   key={'product_' + idx}
+                  onSelect={selectProduct}
+                  onClone={cloneProduct}
+                  onEnable={enableProduct}
+                  onDisable={disableProduct}
                 />
               );
             })}
@@ -67,7 +74,7 @@ class SearchGrid extends React.PureComponent {
   }
 
   renderHead = () => {
-    const {classes, sortBy, sortField, sortOrder, selectAll, selected, handleBulkDisable} = this.props;
+    const {classes, sortBy, sortField, sortOrder, selectAll, selected, bulkEnable, bulkDisable, showAttributeAddDialog} = this.props;
     const isAllSelected = this.props.data.length === selected.length;
     const hasSelections = selected.length > 0;
 
@@ -85,7 +92,9 @@ class SearchGrid extends React.PureComponent {
             <TableCell className={classes.cell}>
               {hasSelections &&
               <BulkActionMenu
-                onDisable={() => handleBulkDisable()}
+                onEnable={bulkEnable}
+                onDisable={bulkDisable}
+                onAttributeAdd={showAttributeAddDialog}
               />}
             </TableCell>
           </Hidden>
@@ -175,7 +184,13 @@ const mdtp = dispatch => ({
   changePage: pageNumber => dispatch(changePage(pageNumber)),
   changePageSize: size => dispatch(changePageSize(size)),
   selectAll: () => dispatch(selectAll()),
-  handleBulkDisable: () => dispatch(bulkDisableProducts())
+  bulkEnable: () => dispatch(bulkEnableProduct()),
+  bulkDisable: () => dispatch(bulkDisableProducts()),
+  showAttributeAddDialog: () => dispatch(openBulkAttributeAddDialog()),
+  selectProduct: index => dispatch(selectProduct(index)),
+  enableProduct: productId => dispatch(enableProduct(productId)),
+  disableProduct: productId => dispatch(disableProduct(productId)),
+  cloneProduct: productId => dispatch(cloneProduct(productId))
 });
 
 export default compose(

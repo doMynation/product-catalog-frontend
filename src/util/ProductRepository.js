@@ -2,12 +2,29 @@ import {API_KEY, API_URL} from "../conf";
 import * as request from "superagent";
 
 class ProductRepository {
+  static enableProducts(productIds) {
+    const url = `${ProductRepository.baseUrl}/admin/products-bulk/enable`;
+
+    return request
+      .patch(url)
+      .send({productIds: productIds})
+      .set(this._prepHeaders());
+  }
+
   static disableProducts(productIds) {
     const url = `${ProductRepository.baseUrl}/admin/products-bulk/disable`;
 
     return request
       .patch(url)
       .send({productIds: productIds})
+      .set(this._prepHeaders());
+  }
+
+  static enableProduct(productId) {
+    const url = `${ProductRepository.baseUrl}/admin/products/${productId}/enable`;
+
+    return request
+      .patch(url)
       .set(this._prepHeaders());
   }
 

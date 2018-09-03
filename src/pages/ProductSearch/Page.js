@@ -9,7 +9,7 @@ import Grid from "@material-ui/core/es/Grid/Grid";
 import TableFilters from "./TableFilters";
 import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
-import {closeBulkAttributeAddDialog, performSearch} from "./index";
+import {bulkAddAttributes, closeBulkAttributeAddDialog, performSearch} from "./index";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
 import Dialog from "@material-ui/core/es/Dialog/Dialog";
 import DialogTitle from "@material-ui/core/es/DialogTitle/DialogTitle";
@@ -19,32 +19,6 @@ import DialogActions from "@material-ui/core/es/DialogActions/DialogActions";
 import Button from "@material-ui/core/es/Button/Button";
 import AttributePicker from "../../shared/AttributePicker";
 
-// @todo: Fetch this from the API
-const availableAttributes = [
-  {
-    value: 18,
-    dataType: "dimension",
-    inputType: "textfield",
-    code: "height",
-    label: "Hauteur",
-    params: ['thing1', 'thing2']
-  },
-  {value: 10, dataType: "dimension", inputType: "textfield", code: "length", label: "Longueur", params: []},
-  {
-    value: 10,
-    dataType: "string",
-    inputType: "select",
-    code: "color",
-    label: "Couleur",
-    values: [
-      {id: 2343, name: 'Bleu'},
-      {id: 2345, name: 'Blanc'},
-      {id: 2348, name: 'Rouge'},
-    ]
-  },
-  {value: 10, dataType: "angle", inputType: "textfield", code: "cutAngle", label: "Angle de coupe", params: []},
-  {value: 10, dataType: "boolean", inputType: "yesno", code: "isFragile", label: "Est fragile", params: []},
-];
 
 const styles = theme => ({
   dialogPaper: {},
@@ -68,28 +42,45 @@ const styles = theme => ({
 
 class ProductSearchPage extends Component {
   state = {
+    bulkAttributes: [],
     isLoading: false,
     categories: [],
     departments: [],
-    stores: []
+    stores: [],
+    attributes: []
   };
 
-  handleSubmit = attributes => {
-    console.log(attributes);
+  handleBulkAttributeChange = attributes => {
+    this.setState({bulkAttributes: attributes});
+  }
+
+  handleBulkAttributeAddSubmit = () => {
+    if (!this.state.bulkAttributes.length) {
+      return;
+    }
+
+    // Use only the necessary data (id/value pair)
+    const data = this.state.bulkAttributes.map(attribute => ({id: attribute.id, value: attribute.value}));
+
+    this.props.bulkAddAttribute(data);
+    this.props.closeBulkAttributeAddDialog();
+    this.setState({bulkAttributes: []});
   }
 
   componentDidMount() {
     const getCategories = () => ProductRepository.getProductCategories();
     const getDepartments = () => ProductRepository.getProductDepartments();
     const getStores = () => ProductRepository.getStores();
+    const getAttributes = () => ProductRepository.getAttributes();
 
-    Promise.all([getCategories(), getDepartments(), getStores()]).then(data => {
-      const [categories, departments, stores] = data;
+    Promise.all([getCategories(), getDepartments(), getStores(), getAttributes()]).then(data => {
+      const [categories, departments, stores, attributes] = data;
 
       this.setState({
         categories: categories,
         departments: departments,
         stores: stores,
+        attributes: attributes,
       });
 
       this.props.performSearch();
@@ -115,14 +106,15 @@ class ProductSearchPage extends Component {
             </DialogContentText>
 
             <AttributePicker
-              availableAttributes={availableAttributes}
-              onChange={this.handleSubmit}
+              availableAttributes={this.state.attributes}
+              selectedAttributes={this.state.bulkAttributes}
+              onChange={this.handleBulkAttributeChange}
             />
           </DialogContent>
 
           <DialogActions>
             <Button onClick={closeBulkAttributeAddDialog} color="primary">Annuler</Button>
-            <Button onClick={this.handleDialogSubmit} color="primary">Soumettre</Button>
+            <Button onClick={this.handleBulkAttributeAddSubmit} color="primary">Soumettre</Button>
           </DialogActions>
         </Dialog>
 
@@ -166,6 +158,7 @@ const mstp = ({productSearch}) => ({
 
 const mdtp = dispatch => ({
   performSearch: () => dispatch(performSearch()),
+  bulkAddAttribute: attributes => dispatch(bulkAddAttributes(attributes)),
   closeBulkAttributeAddDialog: () => dispatch(closeBulkAttributeAddDialog()),
 });
 

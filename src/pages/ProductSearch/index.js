@@ -59,6 +59,31 @@ export const cloneProduct = productId => {
   };
 }
 
+export const bulkAddAttributes = attributes => {
+  return (dispatch, getState) => {
+    const selectedProductIndices = getState().productSearch.selected;
+
+    // Do nothing when no product is selected
+    if (selectedProductIndices.length === 0) {
+      return;
+    }
+
+    // Get the list of matching products
+    const products = getState().productSearch.products;
+    const selectedProductIds = selectedProductIndices.map(index => products[index].id);
+
+    dispatch({type: BULK_ACTION_START});
+
+    ProductRepository.addAttributes(selectedProductIds, attributes)
+      .then(resp => {
+        dispatch({type: BULK_UPDATE_SUCCESS, productIds: selectedProductIds});
+        dispatch(openNotification(`Les attributs ont été ajoutés aux produits ${selectedProductIds.join(", ")}.`));
+        // dispatch(performSearch());
+      })
+      .catch(err => dispatch({type: BULK_ACTION_ERROR}));
+  }
+}
+
 export const bulkEnableProduct = () => {
   return (dispatch, getState) => {
     const selectedProductIndices = getState().productSearch.selected;
@@ -80,9 +105,7 @@ export const bulkEnableProduct = () => {
         dispatch(openNotification(`Les produits ${selectedProductIds.join(", ")} ont été ré-activés.`));
         dispatch(performSearch());
       })
-      .catch(err => {
-        dispatch({type: BULK_ACTION_ERROR, message: err.message});
-      });
+      .catch(err => dispatch({type: BULK_ACTION_ERROR, message: err.message}));
   };
 };
 

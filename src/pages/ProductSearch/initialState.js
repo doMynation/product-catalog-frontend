@@ -1,6 +1,6 @@
 export default {
   bulkAttributeAdd: {
-    isOpen: true
+    isOpen: false
   },
   isLoading: false,
   search: {

@@ -2,8 +2,22 @@ import {API_KEY, API_URL} from "../conf";
 import * as request from "superagent";
 
 class ProductRepository {
+  static addAttributes(productIds, attributes) {
+    const url = `${this.baseUrl}/admin/products-bulk/+attributes`;
+    const convertedAttributes = attributes.map(att => ({...att, value: att.value + ''}));
+
+    return request
+      .patch(url)
+      .send({
+        productIds: productIds,
+        attributes: convertedAttributes
+      })
+      .set(this._prepHeaders());
+    // @todo: Handle 500 errors
+  }
+
   static enableProducts(productIds) {
-    const url = `${ProductRepository.baseUrl}/admin/products-bulk/enable`;
+    const url = `${this.baseUrl}/admin/products-bulk/enable`;
 
     return request
       .patch(url)
@@ -12,7 +26,7 @@ class ProductRepository {
   }
 
   static disableProducts(productIds) {
-    const url = `${ProductRepository.baseUrl}/admin/products-bulk/disable`;
+    const url = `${this.baseUrl}/admin/products-bulk/disable`;
 
     return request
       .patch(url)
@@ -21,7 +35,7 @@ class ProductRepository {
   }
 
   static enableProduct(productId) {
-    const url = `${ProductRepository.baseUrl}/admin/products/${productId}/enable`;
+    const url = `${this.baseUrl}/admin/products/${productId}/enable`;
 
     return request
       .patch(url)
@@ -29,7 +43,7 @@ class ProductRepository {
   }
 
   static disableProduct(productId) {
-    const url = `${ProductRepository.baseUrl}/admin/products/${productId}/disable`;
+    const url = `${this.baseUrl}/admin/products/${productId}/disable`;
 
     return request
       .patch(url)
@@ -37,7 +51,7 @@ class ProductRepository {
   }
 
   static cloneProduct(productId) {
-    const url = `${ProductRepository.baseUrl}/admin/products/${productId}/clone`;
+    const url = `${this.baseUrl}/admin/products/${productId}/clone`;
 
     return request
       .post(url)
@@ -67,7 +81,7 @@ class ProductRepository {
       return `${key}=${params[key]}`;
     }).join("&");
 
-    const url = `${ProductRepository.baseUrl}/products?${queryStringParams}`;
+    const url = `${this.baseUrl}/products?${queryStringParams}`;
 
     return request
       .get(url)
@@ -76,7 +90,7 @@ class ProductRepository {
   }
 
   static get(productId) {
-    const url = `${ProductRepository.baseUrl}/products/${productId}`;
+    const url = `${this.baseUrl}/products/${productId}`;
 
     return fetch(url, {
       method: "GET",
@@ -85,7 +99,7 @@ class ProductRepository {
   }
 
   static getEditData(productId) {
-    const url = `${ProductRepository.baseUrl}/admin/products/${productId}`;
+    const url = `${this.baseUrl}/admin/products/${productId}`;
 
     return fetch(url, {
       method: "GET",
@@ -94,7 +108,7 @@ class ProductRepository {
   }
 
   static getProductCategories() {
-    const url = `${ProductRepository.baseUrl}/productCategories/all`;
+    const url = `${this.baseUrl}/productCategories/all`;
 
     return fetch(url, {
       method: "GET",
@@ -108,8 +122,18 @@ class ProductRepository {
     });
   }
 
+  static getAttributes() {
+    const url = `${this.baseUrl}/attributes/all?lang=fr`;
+
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body);
+  }
+
   static getProductDepartments() {
-    const url = `${ProductRepository.baseUrl}/productDepartments/all`;
+    const url = `${this.baseUrl}/productDepartments/all?lang=fr`;
 
     return fetch(url, {
       method: "GET",

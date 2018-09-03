@@ -21,41 +21,21 @@ const styles = theme => ({
 });
 
 class AttributePicker extends Component {
-  state = {
-    selectedAttributes: [],
-    attributeValue: ""
-  };
-
-  handleAdd = selectedAttribute => {
-    const newAttribute = {...selectedAttribute, value: ""};
-    const newSelectedAttributes = this.state.selectedAttributes.concat([newAttribute])
-
-    this.setState({
-      selectedAttributes: newSelectedAttributes
-    });
-
-    // Emit changes
+  handleAdd = selection => {
+    const newAttribute = {...selection.value, value: ""};
+    const newSelectedAttributes = this.props.selectedAttributes.concat([newAttribute])
+    
     this.props.onChange(newSelectedAttributes);
   }
 
   handleDelete = idx => {
-    const newSelectedAttributes = this.state.selectedAttributes.filter((e, i) => i !== idx);
-
-    this.setState({
-      selectedAttributes: newSelectedAttributes
-    });
-
-    // Emit changes
+    const newSelectedAttributes = this.props.selectedAttributes.filter((e, i) => i !== idx);
     this.props.onChange(newSelectedAttributes);
   }
 
   handleChange = (idx, value) => {
-    const newSelectedAttributes = [...this.state.selectedAttributes]
+    const newSelectedAttributes = [...this.props.selectedAttributes]
     newSelectedAttributes[idx] = {...newSelectedAttributes[idx], value: value};
-
-    this.setState({
-      selectedAttributes: newSelectedAttributes
-    });
 
     // Emit changes
     this.props.onChange(newSelectedAttributes);
@@ -80,14 +60,14 @@ class AttributePicker extends Component {
   }
 
   render() {
-    const {availableAttributes} = this.props;
-    const {selectedAttributes} = this.state;
+    const {availableAttributes, selectedAttributes} = this.props;
+    const options = availableAttributes.map(attribute => ({value: attribute, label: attribute.description.name}));
 
     return (
       <div>
         <AutoComplete
           onChange={this.handleAdd}
-          options={availableAttributes}
+          options={options}
           placeholder="Tapez le nom d'un attribut ..."
         />
 

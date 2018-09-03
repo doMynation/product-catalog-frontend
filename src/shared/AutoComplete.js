@@ -5,8 +5,6 @@ import TextField from "@material-ui/core/es/TextField/TextField";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import Select from "react-select";
-import compose from "redux/src/compose";
-import connect from "react-redux/es/connect/connect";
 import withStyles from "@material-ui/core/es/styles/withStyles";
 
 const styles = theme => ({
@@ -132,18 +130,6 @@ const components = {
 };
 
 class AutoComplete extends React.Component {
-  state = {
-    single: null
-  };
-
-  handleChange = name => value => {
-    this.setState({
-      [name]: value,
-    });
-
-    this.props.onChange(value);
-  };
-
   render() {
     const {classes, theme, options, onChange, placeholder = ""} = this.props;
 
@@ -161,9 +147,10 @@ class AutoComplete extends React.Component {
           styles={selectStyles}
           options={options}
           components={components}
-          value={this.state.single}
           onChange={onChange}
           placeholder={placeholder}
+          value={""}
+          autoFocus
         />
       </div>
     );
@@ -176,7 +163,4 @@ AutoComplete.propTypes = {
   placeholder: PropTypes.string
 };
 
-export default compose(
-  withStyles(styles, {withTheme: true}),
-  connect(null, null)
-)(AutoComplete);
+export default withStyles(styles, {withTheme: true})(AutoComplete);

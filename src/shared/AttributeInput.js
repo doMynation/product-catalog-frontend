@@ -10,33 +10,77 @@ import Select from "@material-ui/core/es/Select/Select";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import FormLabel from "@material-ui/core/es/FormLabel/FormLabel";
 import TextField from "@material-ui/core/es/TextField/TextField";
+import InputAdornment from "@material-ui/core/es/InputAdornment/InputAdornment";
+
+/**
+ *
+ DATA TYPES todo
+ --------------
+ boolean
+ date
+ datetime
+
+ INPUT TYPES todo
+ --------------
+ textarea
+ date
+ yesno
+
+ */
 
 const styles = theme => ({
   radioGroup: {
     flexDirection: 'row'
   },
   formControl: {
-    minWidth: 120
+    // minWidth: 120
   }
 });
 
 class AttributeInput extends React.Component {
-  state = {
-    value: ""
-  };
-
   inputId = `input_${this.props.attribute.code}`;
 
   handleChange = e => {
-    // this.setState({value: e.target.value});
-
     this.props.onChange(e.target.value);
   }
 
   renderTextField(attribute, value) {
+    let props = {};
+
+    if (["angle", "int", "money"].includes(attribute.dataType)) {
+      props.type = "number";
+    }
+
+    if (attribute.dataType === "angle") {
+      props.InputProps = {
+        startAdornment: <InputAdornment position="start">°</InputAdornment>,
+      };
+    } else if (attribute.dataType === "money") {
+      props.InputProps = {
+        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+      };
+    }
+
     return (
       <FormControl>
-        <TextField id={this.inputId} label={attribute.label} placeholder="Valeur ..." value={value} onChange={this.handleChange}/>
+        <TextField id={this.inputId} label={attribute.description.name} value={value} onChange={this.handleChange} {...props}/>
+      </FormControl>
+    );
+  }
+
+  renderDimensionField(attribute, value) {
+    return (
+      <FormControl>
+        <TextField
+          id={this.inputId}
+          label={attribute.description.name}
+          value={value}
+          onChange={this.handleChange}
+          type="number"
+          InputProps={{
+            startAdornment: <InputAdornment position="start">Po</InputAdornment>,
+          }}
+        />
       </FormControl>
     );
   }
@@ -46,9 +90,9 @@ class AttributeInput extends React.Component {
 
     return (
       <FormControl>
-        <FormLabel component="div">{attribute.label}</FormLabel>
+        <FormLabel component="div">{attribute.description.name}</FormLabel>
         <RadioGroup
-          aria-label={attribute.label}
+          aria-label={attribute.description.name}
           name={this.inputId}
           value={value}
           onChange={this.handleChange}
@@ -73,8 +117,8 @@ class AttributeInput extends React.Component {
     const {classes} = this.props;
 
     return (
-      <FormControl className={classes.formControl}>
-        <InputLabel htmlFor={this.inputId}>{attribute.label}</InputLabel>
+      <FormControl className={classes.formControl} fullWidth>
+        <InputLabel htmlFor={this.inputId}>{attribute.description.name}</InputLabel>
         <Select
           value={value}
           onChange={this.handleChange}
@@ -84,7 +128,7 @@ class AttributeInput extends React.Component {
           }}>
           >
           {attribute.values.map((value, idx) => (
-            <MenuItem key={idx} value={value.id}>{value.name}</MenuItem>
+            <MenuItem key={idx} value={value.id}>{value.description.name}</MenuItem>
           ))}
         </Select>
 
@@ -95,13 +139,20 @@ class AttributeInput extends React.Component {
   render() {
     const {attribute, value} = this.props;
 
-    return (
-      <div>
-        {attribute.inputType === 'textfield' && this.renderTextField(attribute, value)}
-        {attribute.inputType === 'yesno' && this.renderYesNo(attribute, value)}
-        {attribute.inputType === 'select' && this.renderSelect(attribute, value)}
-      </div>
-    );
+    switch (attribute.inputType) {
+      case "textfield":
+        if (attribute.dataType === "dimension") {
+          return this.renderDimensionField(attribute, value);
+        }
+
+        return this.renderTextField(attribute, value);
+      case "yesno":
+        return this.renderYesNo(attribute, value);
+      case "select":
+        return this.renderSelect(attribute, value);
+      default:
+        return this.renderTextField(attribute, value);
+    }
   }
 }
 

@@ -26,7 +26,7 @@ class BulkActionMenu extends React.Component {
   handleEnable = () => {
     this.setState({anchorEl: null});
 
-    if (!window.confirm("Êtes-vous sûr de vouloir re-activer tous les produits sélectionnées?")) {
+    if (!window.confirm("Êtes-vous sûr de vouloir réactiver tous les produits sélectionnées?")) {
       return;
     }
 
@@ -62,9 +62,12 @@ class BulkActionMenu extends React.Component {
           open={Boolean(this.state.anchorEl)}
           onClose={this.handleClose}
         >
+          <MenuItem onClick={this.handleEnable} disabled>
+            <ListItemText>Actions de masse</ListItemText>
+          </MenuItem>
           <MenuItem onClick={this.handleEnable}>
             <ListItemIcon><Icon>restore_from_trash</Icon></ListItemIcon>
-            <ListItemText>Activer</ListItemText>
+            <ListItemText>Réactiver</ListItemText>
           </MenuItem>
 
           <MenuItem onClick={this.handleDisable}>
@@ -74,7 +77,7 @@ class BulkActionMenu extends React.Component {
 
           <MenuItem onClick={this.handleAttributeAdd}>
             <ListItemIcon><Icon>playlist_add</Icon></ListItemIcon>
-            <ListItemText>Ajouter un attribut</ListItemText>
+            <ListItemText>Ajouter des attributs</ListItemText>
           </MenuItem>
         </Menu>
       </React.Fragment>

@@ -11,17 +11,9 @@ import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
 import {bulkAddAttributes, closeBulkAttributeAddDialog, performSearch} from "./index";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
-import Dialog from "@material-ui/core/es/Dialog/Dialog";
-import DialogTitle from "@material-ui/core/es/DialogTitle/DialogTitle";
-import DialogContent from "@material-ui/core/es/DialogContent/DialogContent";
-import DialogContentText from "@material-ui/core/es/DialogContentText/DialogContentText";
-import DialogActions from "@material-ui/core/es/DialogActions/DialogActions";
-import Button from "@material-ui/core/es/Button/Button";
-import AttributePicker from "../../shared/AttributePicker";
-
+import BulkAttributeAddDialog from "./BulkAttributeAddDialog";
 
 const styles = theme => ({
-  dialogPaper: {},
   root: {
     padding: theme.spacing.unit * 3,
     width: '100%',
@@ -29,42 +21,33 @@ const styles = theme => ({
   layout: {
     marginTop: theme.spacing.unit
   },
-  modal: {
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    position: 'absolute',
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing.unit * 4,
-  }
 });
 
 class ProductSearchPage extends Component {
   state = {
-    bulkAttributes: [],
     isLoading: false,
     categories: [],
     departments: [],
     stores: [],
-    attributes: []
+    attributes: [],
+    selectedBulkAttributes: [],
   };
 
   handleBulkAttributeChange = attributes => {
-    this.setState({bulkAttributes: attributes});
+    this.setState({selectedBulkAttributes: attributes});
   }
 
   handleBulkAttributeAddSubmit = () => {
-    if (!this.state.bulkAttributes.length) {
+    if (!this.state.selectedBulkAttributes.length) {
       return;
     }
 
     // Use only the necessary data (id/value pair)
-    const data = this.state.bulkAttributes.map(attribute => ({id: attribute.id, value: attribute.value}));
+    const data = this.state.selectedBulkAttributes.map(attribute => ({id: attribute.id, value: attribute.value}));
 
-    this.props.bulkAddAttribute(data);
+    this.props.bulkAddAttributes(data);
     this.props.closeBulkAttributeAddDialog();
-    this.setState({bulkAttributes: []});
+    this.setState({selectedBulkAttributes: []});
   }
 
   componentDidMount() {
@@ -92,31 +75,14 @@ class ProductSearchPage extends Component {
 
     return (
       <div className={classes.root}>
-        <Dialog
-          open={isBulkAttributeAddDialogOpen}
+        <BulkAttributeAddDialog
+          isOpen={isBulkAttributeAddDialogOpen}
           onClose={closeBulkAttributeAddDialog}
-          aria-labelledby="form-dialog-title"
-          classes={{paperScrollPaper: classes.dialogPaper}}
-        >
-          <DialogTitle id="form-dialog-title">Ajouter un ou plusieurs attributs</DialogTitle>
-          <DialogContent className={classes.dialogPaper}>
-            <DialogContentText style={{marginBottom: 16}}>
-              Cliquez sur le champ de texte ci-dessous, puis sélectionnez un ou plusieurs attributs. Définissez ensuite la valeur de chaque attribut.
-              Appuyez ensuite sur <strong>Soumettre</strong> pour ajouter ces attributs aux produits sélectionnés.
-            </DialogContentText>
-
-            <AttributePicker
-              availableAttributes={this.state.attributes}
-              selectedAttributes={this.state.bulkAttributes}
-              onChange={this.handleBulkAttributeChange}
-            />
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={closeBulkAttributeAddDialog} color="primary">Annuler</Button>
-            <Button onClick={this.handleBulkAttributeAddSubmit} color="primary">Soumettre</Button>
-          </DialogActions>
-        </Dialog>
+          availableAttributes={this.state.attributes}
+          selectedAttributes={this.state.selectedBulkAttributes}
+          onChange={this.handleBulkAttributeChange}
+          onSubmit={this.handleBulkAttributeAddSubmit}
+        />
 
         <PageHeader text="Trouver un produit"></PageHeader>
 
@@ -158,7 +124,7 @@ const mstp = ({productSearch}) => ({
 
 const mdtp = dispatch => ({
   performSearch: () => dispatch(performSearch()),
-  bulkAddAttribute: attributes => dispatch(bulkAddAttributes(attributes)),
+  bulkAddAttributes: attributes => dispatch(bulkAddAttributes(attributes)),
   closeBulkAttributeAddDialog: () => dispatch(closeBulkAttributeAddDialog()),
 });
 

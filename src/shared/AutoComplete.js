@@ -8,6 +8,9 @@ import Select from "react-select";
 import withStyles from "@material-ui/core/es/styles/withStyles";
 
 const styles = theme => ({
+  root: {
+    width: '100%'
+  },
   input: {
     display: 'flex',
     padding: 0,
@@ -129,10 +132,9 @@ const components = {
   Menu,
 };
 
-class AutoComplete extends React.Component {
+class AutoComplete extends React.PureComponent {
   render() {
     const {classes, theme, options, onChange, placeholder = ""} = this.props;
-
     const selectStyles = {
       input: base => ({
         ...base,

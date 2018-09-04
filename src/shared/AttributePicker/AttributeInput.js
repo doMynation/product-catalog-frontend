@@ -33,7 +33,7 @@ const styles = theme => ({
     flexDirection: 'row'
   },
   formControl: {
-    // minWidth: 120
+    minWidth: 250
   }
 });
 
@@ -117,7 +117,7 @@ class AttributeInput extends React.Component {
     const {classes} = this.props;
 
     return (
-      <FormControl className={classes.formControl} fullWidth>
+      <FormControl className={classes.formControl}>
         <InputLabel htmlFor={this.inputId}>{attribute.description.name}</InputLabel>
         <Select
           value={value}

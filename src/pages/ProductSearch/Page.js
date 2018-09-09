@@ -33,23 +33,6 @@ class ProductSearchPage extends Component {
     selectedBulkAttributes: [],
   };
 
-  handleBulkAttributeChange = attributes => {
-    this.setState({selectedBulkAttributes: attributes});
-  }
-
-  handleBulkAttributeAddSubmit = () => {
-    if (!this.state.selectedBulkAttributes.length) {
-      return;
-    }
-
-    // Use only the necessary data (id/value pair)
-    const data = this.state.selectedBulkAttributes.map(attribute => ({id: attribute.id, value: attribute.value}));
-
-    this.props.bulkAddAttributes(data);
-    this.props.closeBulkAttributeAddDialog();
-    this.setState({selectedBulkAttributes: []});
-  }
-
   componentDidMount() {
     const getCategories = () => ProductRepository.getProductCategories();
     const getDepartments = () => ProductRepository.getProductDepartments();
@@ -70,14 +53,41 @@ class ProductSearchPage extends Component {
     });
   }
 
+  handleBulkAttributeChange = attributes => {
+    this.setState({selectedBulkAttributes: attributes});
+  }
+
+  handleBulkAttributeAddSubmit = () => {
+    if (!this.state.selectedBulkAttributes.length) {
+      return;
+    }
+
+    const selectedAttributes = this.state.selectedBulkAttributes.map(item => ({
+      id: this.state.attributes[item.key].id,
+      value: item.value,
+      isEditable: item.isEditable
+    }));
+
+    this.props.bulkAddAttributes(selectedAttributes);
+    this.props.closeBulkAttributeAddDialog();
+    this.setState({selectedBulkAttributes: []});
+  }
+
+  handleBulkAttributeClose = () => {
+    this.setState(state => ({selectedBulkAttributes: []}), () => {
+      this.props.closeBulkAttributeAddDialog();
+    });
+  }
+
+
   render() {
-    const {classes, isBulkAttributeAddDialogOpen, closeBulkAttributeAddDialog} = this.props;
+    const {classes, isBulkAttributeAddDialogOpen} = this.props;
 
     return (
       <div className={classes.root}>
         <BulkAttributeAddDialog
           isOpen={isBulkAttributeAddDialogOpen}
-          onClose={closeBulkAttributeAddDialog}
+          onClose={this.handleBulkAttributeClose}
           availableAttributes={this.state.attributes}
           selectedAttributes={this.state.selectedBulkAttributes}
           onChange={this.handleBulkAttributeChange}

@@ -65,6 +65,7 @@ class BulkActionMenu extends React.Component {
           <MenuItem onClick={this.handleEnable} disabled>
             <ListItemText>Actions de masse</ListItemText>
           </MenuItem>
+
           <MenuItem onClick={this.handleEnable}>
             <ListItemIcon><Icon>restore_from_trash</Icon></ListItemIcon>
             <ListItemText>Réactiver</ListItemText>

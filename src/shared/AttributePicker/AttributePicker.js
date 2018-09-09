@@ -10,6 +10,8 @@ import Collapse from "@material-ui/core/es/Collapse/Collapse";
 import SavedTemplates from "./SavedTemplates";
 import AutoComplete from "../AutoComplete";
 import moment from "moment";
+import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
+import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
 
 const styles = theme => ({
   header: {
@@ -29,6 +31,9 @@ const styles = theme => ({
   },
   deleteButton: {
     marginRight: theme.spacing.unit
+  },
+  isEditableControl: {
+    marginLeft: 'auto'
   }
 });
 
@@ -56,10 +61,16 @@ class AttributePicker extends Component {
   }
 
   handleAddSavedTemplate = templateName => {
+    const selectedAttributes = this.props.selectedAttributes.map(item => ({
+      id: this.selectAttribute(item.key).id,
+      value: item.value,
+      isEditable: item.isEditable
+    }));
+
     const newTemplate = {
       name: templateName,
       date: moment().format("YYYY-MM-DD H:mm"),
-      items: this.props.selectedAttributes.map(attr => ({id: attr.id, value: attr.value}))
+      items: selectedAttributes
     };
 
     const newSavedTemplates = this.state.savedTemplates.concat([newTemplate]);
@@ -69,7 +80,6 @@ class AttributePicker extends Component {
 
   handleDeleteSavedTemplate = idx => {
     const newSavedTemplates = [...this.state.savedTemplates];
-
     newSavedTemplates.splice(idx, 1);
 
     this.setState({savedTemplates: newSavedTemplates});
@@ -83,13 +93,13 @@ class AttributePicker extends Component {
     }
 
     const newSelectedAttributes = template.items.reduce((acc, savedAttr) => {
-      const newAttribute = this.props.availableAttributes.find(attr => attr.id === savedAttr.id);
+      const attributeKey = this.props.availableAttributes.findIndex(attr => attr.id === savedAttr.id);
 
-      if (newAttribute === undefined) {
+      if (attributeKey === -1) {
         return acc;
       }
 
-      return acc.concat([{...newAttribute, value: savedAttr.value}]);
+      return acc.concat([{key: attributeKey, value: savedAttr.value, isEditable: savedAttr.isEditable}]);
     }, []);
 
     this.props.onChange(newSelectedAttributes);
@@ -101,7 +111,7 @@ class AttributePicker extends Component {
       return;
     }
 
-    const newAttribute = {...selection.value, value: ""};
+    const newAttribute = {key: selection.value, value: "", isEditable: false};
     const newSelectedAttributes = this.props.selectedAttributes.concat([newAttribute]);
 
     this.props.onChange(newSelectedAttributes);
@@ -113,15 +123,23 @@ class AttributePicker extends Component {
     this.props.onChange(newSelectedAttributes);
   }
 
-  handleChange = (idx, value) => {
+  handleValueChange = (idx, value) => {
     const newSelectedAttributes = [...this.props.selectedAttributes];
     newSelectedAttributes[idx] = {...newSelectedAttributes[idx], value: value};
 
     this.props.onChange(newSelectedAttributes);
   }
 
-  renderAttribute(attribute, idx) {
+  handleEditableChange = (idx, event) => {
+    const newSelectedAttributes = [...this.props.selectedAttributes];
+    newSelectedAttributes[idx] = {...newSelectedAttributes[idx], isEditable: event.target.checked};
+
+    this.props.onChange(newSelectedAttributes);
+  }
+
+  renderAttribute(selected, idx) {
     const {classes} = this.props;
+    const attribute = this.selectAttribute(selected.key);
 
     return (
       <div key={'attribute_idx_' + idx} className={classes.listItem}>
@@ -131,21 +149,39 @@ class AttributePicker extends Component {
 
         <AttributeInput
           attribute={attribute}
-          value={attribute.value}
-          onChange={value => this.handleChange(idx, value)}
+          value={selected.value}
+          onChange={value => this.handleValueChange(idx, value)}
+        />
+
+        <FormControlLabel
+          className={classes.isEditableControl}
+          control={
+            <Checkbox checked={selected.isEditable} onChange={e => this.handleEditableChange(idx, e)} value="1"/>
+          }
+          label="Modifiable"
         />
       </div>
     );
   }
 
+  selectAttribute = key => {
+    return this.props.availableAttributes[key];
+  }
+
   render() {
     const {classes, availableAttributes, selectedAttributes} = this.props;
     const {savedTemplates, isSavedTemplateMode} = this.state;
-    const notSelectedAttributes = availableAttributes.filter(attribute => {
-      return !selectedAttributes.some(inner => inner.id === attribute.id);
-    });
+    const options = availableAttributes.reduce((acc, attribute, key) => {
+      // Exclude selected options
+      const isSelected = selectedAttributes.some(value => value.key === key);
+      if (isSelected) {
+        return acc;
+      }
 
-    const options = notSelectedAttributes.map(attribute => ({value: attribute, label: attribute.description.name}));
+      acc.push({value: key, label: attribute.description.name});
+
+      return acc;
+    }, []);
 
     return (
       <React.Fragment>
@@ -167,7 +203,7 @@ class AttributePicker extends Component {
           </div>
 
           <List>
-            {selectedAttributes.map((attribute, idx) => this.renderAttribute(attribute, idx))}
+            {selectedAttributes.map((selected, idx) => this.renderAttribute(selected, idx))}
           </List>
         </Collapse>
 

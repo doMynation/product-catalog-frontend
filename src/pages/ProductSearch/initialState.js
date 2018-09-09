@@ -26,4 +26,3 @@ export default {
   recentlyUpdated: [],
   productsCount: 0,
 };
-

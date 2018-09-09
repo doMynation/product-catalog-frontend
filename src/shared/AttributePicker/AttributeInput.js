@@ -16,7 +16,6 @@ import InputAdornment from "@material-ui/core/es/InputAdornment/InputAdornment";
  *
  DATA TYPES todo
  --------------
- boolean
  date
  datetime
 
@@ -45,6 +44,7 @@ class AttributeInput extends React.Component {
   }
 
   renderTextField(attribute, value) {
+    const {classes} = this.props;
     let props = {};
 
     if (["angle", "int", "money"].includes(attribute.dataType)) {
@@ -62,15 +62,17 @@ class AttributeInput extends React.Component {
     }
 
     return (
-      <FormControl>
+      <FormControl className={classes.formControl}>
         <TextField id={this.inputId} label={attribute.description.name} value={value} onChange={this.handleChange} {...props}/>
       </FormControl>
     );
   }
 
   renderDimensionField(attribute, value) {
+    const {classes} = this.props;
+
     return (
-      <FormControl>
+      <FormControl className={classes.formControl}>
         <TextField
           id={this.inputId}
           label={attribute.description.name}
@@ -85,11 +87,21 @@ class AttributeInput extends React.Component {
     );
   }
 
+  renderBooleanField(attribute, value) {
+    const {classes} = this.props;
+
+    return (
+      <FormControl className={classes.formControl}>
+        <FormLabel>{attribute.description.name}</FormLabel>
+      </FormControl>
+    )
+  }
+
   renderYesNo(attribute, value) {
     const {classes} = this.props;
 
     return (
-      <FormControl>
+      <FormControl className={classes.formControl}>
         <FormLabel component="div">{attribute.description.name}</FormLabel>
         <RadioGroup
           aria-label={attribute.description.name}
@@ -131,13 +143,16 @@ class AttributeInput extends React.Component {
             <MenuItem key={idx} value={value.id}>{value.description.name}</MenuItem>
           ))}
         </Select>
-
       </FormControl>
     );
   }
 
   render() {
     const {attribute, value} = this.props;
+
+    if (attribute.dataType === "boolean") {
+      return this.renderBooleanField(attribute, value);
+    }
 
     switch (attribute.inputType) {
       case "textfield":

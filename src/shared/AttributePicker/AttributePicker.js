@@ -111,7 +111,12 @@ class AttributePicker extends Component {
       return;
     }
 
-    const newAttribute = {key: selection.value, value: "", isEditable: false};
+    const attribute = this.selectAttribute(selection.value);
+    const newAttribute = {
+      key: selection.value,
+      value: attribute.dataType === "boolean" ? "1" : "", // boolean attributes default to truthy
+      isEditable: false
+    };
     const newSelectedAttributes = this.props.selectedAttributes.concat([newAttribute]);
 
     this.props.onChange(newSelectedAttributes);
@@ -153,6 +158,7 @@ class AttributePicker extends Component {
           onChange={value => this.handleValueChange(idx, value)}
         />
 
+        {attribute.dataType !== "boolean" &&
         <FormControlLabel
           className={classes.isEditableControl}
           control={
@@ -160,6 +166,7 @@ class AttributePicker extends Component {
           }
           label="Modifiable"
         />
+        }
       </div>
     );
   }

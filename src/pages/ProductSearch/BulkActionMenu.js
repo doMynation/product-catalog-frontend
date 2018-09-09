@@ -3,29 +3,17 @@ import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Icon from "@material-ui/core/es/Icon/Icon";
-import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
-import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
-import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
-import Menu from "@material-ui/core/es/Menu/Menu";
+import Grow from "@material-ui/core/es/Grow/Grow";
+import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 
-const styles = theme => ({});
+const styles = theme => ({
+  button: {
+    color: 'white'
+  }
+});
 
 class BulkActionMenu extends React.Component {
-  state = {
-    anchorEl: null
-  };
-
-  handleMore = event => {
-    this.setState({anchorEl: event.currentTarget});
-  }
-
-  handleClose = () => {
-    this.setState({anchorEl: null});
-  }
-
   handleEnable = () => {
-    this.setState({anchorEl: null});
-
     if (!window.confirm("Êtes-vous sûr de vouloir réactiver tous les produits sélectionnées?")) {
       return;
     }
@@ -34,8 +22,6 @@ class BulkActionMenu extends React.Component {
   }
 
   handleDisable = () => {
-    this.setState({anchorEl: null});
-
     if (!window.confirm("Êtes-vous sûr de vouloir désactiver tous les produits sélectionnées?")) {
       return;
     }
@@ -44,44 +30,44 @@ class BulkActionMenu extends React.Component {
   }
 
   handleAttributeAdd = () => {
-    this.setState({anchorEl: null});
-
     this.props.onAttributeAdd();
   }
 
   render() {
+    const {classes} = this.props;
+
     return (
-      <React.Fragment>
-        <IconButton onClick={this.handleMore}>
-          <Icon>more_vert</Icon>
-        </IconButton>
+      <div>
+        <Grow timeout={300} in={true}>
+          <span>
+          <Tooltip title="Réactiver">
+            <IconButton onClick={this.handleEnable} className={classes.button}>
+              <Icon>restore_from_trash</Icon>
+            </IconButton>
+          </Tooltip>
+          </span>
+        </Grow>
 
-        <Menu
-          id={'bulk-more-button'}
-          anchorEl={this.state.anchorEl}
-          open={Boolean(this.state.anchorEl)}
-          onClose={this.handleClose}
-        >
-          <MenuItem onClick={this.handleEnable} disabled>
-            <ListItemText>Actions de masse</ListItemText>
-          </MenuItem>
+        <Grow timeout={800} in={true}>
+          <span>
+            <Tooltip title="Désactiver">
+              <IconButton onClick={this.handleDisable} className={classes.button}>
+                <Icon>delete</Icon>
+              </IconButton>
+            </Tooltip>
+          </span>
+        </Grow>
 
-          <MenuItem onClick={this.handleEnable}>
-            <ListItemIcon><Icon>restore_from_trash</Icon></ListItemIcon>
-            <ListItemText>Réactiver</ListItemText>
-          </MenuItem>
-
-          <MenuItem onClick={this.handleDisable}>
-            <ListItemIcon><Icon>delete</Icon></ListItemIcon>
-            <ListItemText>Désactiver</ListItemText>
-          </MenuItem>
-
-          <MenuItem onClick={this.handleAttributeAdd}>
-            <ListItemIcon><Icon>playlist_add</Icon></ListItemIcon>
-            <ListItemText>Ajouter des attributs</ListItemText>
-          </MenuItem>
-        </Menu>
-      </React.Fragment>
+        <Grow timeout={1000} in={true}>
+          <span>
+          <Tooltip title="Ajouter des attributs">
+            <IconButton onClick={this.handleAttributeAdd} className={classes.button}>
+              <Icon>playlist_add</Icon>
+            </IconButton>
+          </Tooltip>
+          </span>
+        </Grow>
+      </div>
     );
   }
 }

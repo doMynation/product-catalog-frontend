@@ -17,14 +17,16 @@ import SearchResult from "./SearchResult";
 import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
 import {
-  bulkDisableProducts, bulkEnableProduct, changePage, changePageSize, cloneProduct, disableProduct, enableProduct,
-  openBulkAttributeAddDialog,
+  changePage,
+  changePageSize,
+  cloneProduct,
+  disableProduct,
+  enableProduct,
   resetSearch,
   selectAll, selectProduct,
   sortBy
 } from "./index";
 import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
-import BulkActionMenu from "./BulkActionMenu";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
 
 const styles = theme => ({
@@ -74,9 +76,8 @@ class SearchGrid extends React.PureComponent {
   }
 
   renderHead = () => {
-    const {classes, sortBy, sortField, sortOrder, selectAll, selected, bulkEnable, bulkDisable, showAttributeAddDialog} = this.props;
+    const {classes, sortBy, sortField, sortOrder, selectAll, selected} = this.props;
     const isAllSelected = this.props.data.length === selected.length;
-    const hasSelections = selected.length > 0;
 
     return (
       <TableHead>
@@ -89,14 +90,7 @@ class SearchGrid extends React.PureComponent {
           </TableCell>
 
           <Hidden smDown>
-            <TableCell className={classes.cell}>
-              {hasSelections &&
-              <BulkActionMenu
-                onEnable={bulkEnable}
-                onDisable={bulkDisable}
-                onAttributeAdd={showAttributeAddDialog}
-              />}
-            </TableCell>
+            <TableCell className={classes.cell}>{' '}</TableCell>
           </Hidden>
 
           <Hidden only="xs">
@@ -184,9 +178,6 @@ const mdtp = dispatch => ({
   changePage: pageNumber => dispatch(changePage(pageNumber)),
   changePageSize: size => dispatch(changePageSize(size)),
   selectAll: () => dispatch(selectAll()),
-  bulkEnable: () => dispatch(bulkEnableProduct()),
-  bulkDisable: () => dispatch(bulkDisableProducts()),
-  showAttributeAddDialog: () => dispatch(openBulkAttributeAddDialog()),
   selectProduct: index => dispatch(selectProduct(index)),
   enableProduct: productId => dispatch(enableProduct(productId)),
   disableProduct: productId => dispatch(disableProduct(productId)),

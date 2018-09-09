@@ -8,9 +8,9 @@ const styles = theme => ({
   root: {
     display: 'flex',
     alignItems: 'center',
-    height: 100,
-    minHeight: 100,
-    padding: theme.spacing.unit
+    height: 80,
+    minHeight: 80,
+    padding: theme.spacing.unit / 2
   },
   icon: {
     color: "white",

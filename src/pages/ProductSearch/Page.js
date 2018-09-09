@@ -9,9 +9,17 @@ import Grid from "@material-ui/core/es/Grid/Grid";
 import TableFilters from "./TableFilters";
 import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
-import {bulkAddAttributes, closeBulkAttributeAddDialog, performSearch} from "./index";
+import {
+  bulkAddAttributes,
+  bulkEnableProduct,
+  bulkDisableProducts,
+  openBulkAttributeAddDialog,
+  closeBulkAttributeAddDialog,
+  performSearch
+} from "./index";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
 import BulkAttributeAddDialog from "./BulkAttributeAddDialog";
+import BulkActionMenu from "./BulkActionMenu";
 
 const styles = theme => ({
   root: {
@@ -21,6 +29,9 @@ const styles = theme => ({
   layout: {
     marginTop: theme.spacing.unit
   },
+  bulkActionMenuContainer: {
+    minHeight: theme.spacing.unit * 6
+  }
 });
 
 class ProductSearchPage extends Component {
@@ -81,7 +92,7 @@ class ProductSearchPage extends Component {
 
 
   render() {
-    const {classes, isBulkAttributeAddDialogOpen} = this.props;
+    const {classes, isBulkAttributeAddDialogOpen, selectedProducts, bulkEnable, bulkDisable, showAttributeAddDialog} = this.props;
 
     return (
       <div className={classes.root}>
@@ -94,7 +105,23 @@ class ProductSearchPage extends Component {
           onSubmit={this.handleBulkAttributeAddSubmit}
         />
 
-        <PageHeader text="Trouver un produit"></PageHeader>
+        <PageHeader text="Trouver un produit"/>
+
+        <Grid container>
+          <Grid item xs={12} md={2} lg={2}>{''}</Grid>
+
+          <Grid item xs={12} md={10} lg={10}>
+            <div className={classes.bulkActionMenuContainer}>
+              {selectedProducts.length !== 0 &&
+              <BulkActionMenu
+                onEnable={bulkEnable}
+                onDisable={bulkDisable}
+                onAttributeAdd={showAttributeAddDialog}
+              />
+              }
+            </div>
+          </Grid>
+        </Grid>
 
         <Grid container className={classes.layout} spacing={16}>
           <Hidden smDown>
@@ -130,12 +157,16 @@ const mstp = ({productSearch}) => ({
   productsCount: productSearch.productsCount,
   isLoading: productSearch.isLoading,
   isBulkAttributeAddDialogOpen: productSearch.bulkAttributeAdd.isOpen,
+  selectedProducts: productSearch.selected,
 });
 
 const mdtp = dispatch => ({
   performSearch: () => dispatch(performSearch()),
   bulkAddAttributes: attributes => dispatch(bulkAddAttributes(attributes)),
   closeBulkAttributeAddDialog: () => dispatch(closeBulkAttributeAddDialog()),
+  bulkEnable: () => dispatch(bulkEnableProduct()),
+  bulkDisable: () => dispatch(bulkDisableProducts()),
+  showAttributeAddDialog: () => dispatch(openBulkAttributeAddDialog()),
 });
 
 export default compose(

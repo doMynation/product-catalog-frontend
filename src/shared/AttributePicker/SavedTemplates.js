@@ -24,42 +24,52 @@ const styles = theme => ({
   },
 });
 
-const SavedTemplates = ({classes, items, onSelect, onAdd, onDelete, onClose, allowSave = true}) => (
-  <div>
-    <div className={classes.saveContainer}>
-      {allowSave &&
-      <SaveTemplateButton onSubmit={onAdd}/>
-      }
+const SavedTemplates = ({classes, items, onSelect, onAdd, onDelete, onClose, allowSave = true}) => {
+  // Sort by date descending
+  const sortedItems = items.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
 
-      <Tooltip title="Retour" placement="top">
-        <IconButton aria-label="Retour" onClick={onClose} style={{marginLeft: 'auto'}}>
-          <Icon>close</Icon>
-        </IconButton>
-      </Tooltip>
+    return dateB - dateA;
+  });
+
+  return (
+    <div>
+      <div className={classes.saveContainer}>
+        {allowSave &&
+        <SaveTemplateButton onSubmit={onAdd}/>
+        }
+
+        <Tooltip title="Retour" placement="top">
+          <IconButton aria-label="Retour" onClick={onClose} style={{marginLeft: 'auto'}}>
+            <Icon>close</Icon>
+          </IconButton>
+        </Tooltip>
+      </div>
+
+      <div className={classes.templatesHeader}>
+        <Icon style={{marginRight: 8}}>history</Icon>
+        <Typography variant="title">Listes d'attributs sauvegardées</Typography>
+      </div>
+
+      <List dense>
+        {sortedItems.map((item, idx) => {
+          return (
+            <ListItem key={idx} button onClick={() => onSelect(idx)}>
+              <ListItemText primary={item.name} secondary={`créée le ${item.date}`}/>
+
+              <ListItemSecondaryAction>
+                <IconButton aria-label="Supprimer" onClick={() => onDelete(idx)}>
+                  <Icon>delete</Icon>
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
+      </List>
     </div>
-
-    <div className={classes.templatesHeader}>
-      <Icon style={{marginRight: 8}}>history</Icon>
-      <Typography variant="title">Listes d'attributs sauvegardées</Typography>
-    </div>
-
-    <List dense>
-      {items.map((item, idx) => {
-        return (
-          <ListItem key={idx} button onClick={() => onSelect(idx)}>
-            <ListItemText primary={item.name} secondary={`créée le ${item.date}`}/>
-
-            <ListItemSecondaryAction>
-              <IconButton aria-label="Supprimer" onClick={() => onDelete(idx)}>
-                <Icon>delete</Icon>
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        );
-      })}
-    </List>
-  </div>
-);
+  );
+}
 
 SavedTemplates.propTypes = {
   items: PropTypes.array.isRequired,

@@ -1,5 +1,6 @@
 import React from 'react';
 import {compose} from 'redux';
+import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import TextField from "@material-ui/core/es/TextField/TextField";
@@ -12,7 +13,6 @@ import FormControl from "@material-ui/core/es/FormControl/FormControl";
 import InputLabel from "@material-ui/core/es/InputLabel/InputLabel";
 import Select from "@material-ui/core/es/Select/Select";
 import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
-import connect from "react-redux/es/connect/connect";
 import {applyFilters} from "./index";
 import Switch from "@material-ui/core/es/Switch/Switch";
 import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
@@ -46,8 +46,8 @@ class TableFilters extends React.PureComponent {
     sku: this.props.sku,
     name: this.props.name,
     storeId: this.props.storeId,
-    category: this.props.category,
-    department: this.props.department,
+    categoryId: this.props.categoryId,
+    department: this.props.departmentId,
     isKit: this.props.isKit,
     isCustom: this.props.isCustom,
     isEnabled: this.props.isEnabled,
@@ -135,11 +135,12 @@ class TableFilters extends React.PureComponent {
             <CategoriesDropdown
               categories={this.props.categories}
               onChange={this.handleFilterChange}
-              value={this.state.category}
-              id="category"
-              name="category"
+              value={this.state.categoryId}
+              id="categoryId"
+              name="categoryId"
               label="Catégorie"
               containerClass={classes.formControl}
+              selectAll="Toutes"
             />
 
             <br/>
@@ -156,7 +157,7 @@ class TableFilters extends React.PureComponent {
                 <MenuItem value="">
                   <em>Tous</em>
                 </MenuItem>
-                {this.props.departments.map((department, idx) => (
+                {Object.entries(this.props.departments).map(([idx, department]) => (
                   <MenuItem key={idx} value={department.code}>{department.description.name}</MenuItem>
                 ))}
               </Select>
@@ -174,7 +175,7 @@ class TableFilters extends React.PureComponent {
                 <MenuItem value="">
                   <em>Tous</em>
                 </MenuItem>
-                {this.props.stores.map((store, idx) => (
+                {Object.entries(this.props.stores).map(([idx, store]) => (
                   <MenuItem key={idx} value={store.id}>{store.name}</MenuItem>
                 ))}
               </Select>
@@ -285,9 +286,9 @@ class TableFilters extends React.PureComponent {
 }
 
 TableFilters.propTypes = {
-  categories: PropTypes.array.isRequired,
-  departments: PropTypes.array.isRequired,
-  stores: PropTypes.array.isRequired,
+  categories: PropTypes.objectOf(PropTypes.object).isRequired,
+  departments: PropTypes.objectOf(PropTypes.object).isRequired,
+  stores: PropTypes.objectOf(PropTypes.object).isRequired,
   id: PropTypes.string,
   sku: PropTypes.string,
   name: PropTypes.string,
@@ -295,8 +296,8 @@ TableFilters.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
-  category: PropTypes.string,
-  department: PropTypes.string,
+  categoryId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  departmentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isKit: PropTypes.string,
   isPart: PropTypes.string,
   isCustom: PropTypes.string,

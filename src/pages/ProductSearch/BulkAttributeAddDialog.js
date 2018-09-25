@@ -46,8 +46,8 @@ BulkAttributeAddDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  availableAttributes: PropTypes.array.isRequired,
-  selectedAttributes: PropTypes.array.isRequired,
+  availableAttributes: PropTypes.objectOf(PropTypes.object).isRequired,
+  selectedAttributes: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default BulkAttributeAddDialog;

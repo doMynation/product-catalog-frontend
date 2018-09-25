@@ -61,16 +61,10 @@ class AttributePicker extends Component {
   }
 
   handleAddSavedTemplate = templateName => {
-    const selectedAttributes = this.props.selectedAttributes.map(item => ({
-      id: this.selectAttribute(item.key).id,
-      value: item.value,
-      isEditable: item.isEditable
-    }));
-
     const newTemplate = {
       name: templateName,
       date: moment().format("YYYY-MM-DD H:mm"),
-      items: selectedAttributes
+      items: [...this.props.selectedAttributes]
     };
 
     const newSavedTemplates = this.state.savedTemplates.concat([newTemplate]);
@@ -92,28 +86,22 @@ class AttributePicker extends Component {
       return;
     }
 
-    const newSelectedAttributes = template.items.reduce((acc, savedAttr) => {
-      const attributeKey = this.props.availableAttributes.findIndex(attr => attr.id === savedAttr.id);
-
-      if (attributeKey === -1) {
-        return acc;
-      }
-
-      return acc.concat([{key: attributeKey, value: savedAttr.value, isEditable: savedAttr.isEditable}]);
-    }, []);
+    // Filter out attributes that no longer exist
+    const newSelectedAttributes = template.items.filter(savedAttr => this.props.availableAttributes[savedAttr.id]);
 
     this.props.onChange(newSelectedAttributes);
     this.toggleSavedTemplateMode();
   }
 
   handleAdd = selection => {
+    // Fixes bug when pressing backspace when the autocomplete input is empty
     if (selection === undefined || selection.length === 0) {
       return;
     }
 
-    const attribute = this.selectAttribute(selection.value);
+    const attribute = this.props.availableAttributes[selection.value];
     const newAttribute = {
-      key: selection.value,
+      id: selection.value,
       value: attribute.dataType === "boolean" ? "1" : "", // boolean attributes default to truthy
       isEditable: false
     };
@@ -144,7 +132,7 @@ class AttributePicker extends Component {
 
   renderAttribute(selected, idx) {
     const {classes} = this.props;
-    const attribute = this.selectAttribute(selected.key);
+    const attribute = this.props.availableAttributes[selected.id];
 
     return (
       <div key={'attribute_idx_' + idx} className={classes.listItem}>
@@ -171,24 +159,14 @@ class AttributePicker extends Component {
     );
   }
 
-  selectAttribute = key => {
-    return this.props.availableAttributes[key];
-  }
-
   render() {
     const {classes, availableAttributes, selectedAttributes} = this.props;
     const {savedTemplates, isSavedTemplateMode} = this.state;
-    const options = availableAttributes.reduce((acc, attribute, key) => {
-      // Exclude selected options
-      const isSelected = selectedAttributes.some(value => value.key === key);
-      if (isSelected) {
-        return acc;
-      }
 
-      acc.push({value: key, label: attribute.description.name});
-
-      return acc;
-    }, []);
+    // Filter out selected attributes
+    const options = Object.entries(availableAttributes)
+      .filter(([key, attribute]) => selectedAttributes.every(value => value.id !== attribute.id))
+      .map(([key, attribute]) => ({value: attribute.id, label: attribute.description.name}));
 
     return (
       <React.Fragment>
@@ -230,7 +208,8 @@ class AttributePicker extends Component {
 }
 
 AttributePicker.propTypes = {
-  availableAttributes: PropTypes.array.isRequired,
+  availableAttributes: PropTypes.objectOf(PropTypes.object),
+  selectedAttributes: PropTypes.arrayOf(PropTypes.object),
   onChange: PropTypes.func.isRequired
 };
 

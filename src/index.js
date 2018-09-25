@@ -8,7 +8,6 @@ import MuiThemeProvider from "@material-ui/core/es/styles/MuiThemeProvider";
 import CssBaseline from "@material-ui/core/es/CssBaseline/CssBaseline";
 import {store} from './store';
 import Provider from "react-redux/es/components/Provider";
-import './index.css';
 
 ReactDOM.render((
   <BrowserRouter>

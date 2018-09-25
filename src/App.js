@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import ProductSearchPage from './pages/ProductSearch/Page'
+import ProductCreatePage from './pages/ProductCreate/Page'
 import ProductEditPage from "./pages/ProductEdit/Page";
 import {Route} from "react-router-dom";
 import HomePage from "./pages/Home/Page";
@@ -37,6 +38,7 @@ class App extends Component {
         <Grid container className={classes.content}>
           <Route exact path="/" component={HomePage}/>
           <Route exact path="/products" component={ProductSearchPage}/>
+          <Route exact path="/create-product" component={ProductCreatePage}/>
           <Route path="/products/:productId" component={ProductEditPage}/>
         </Grid>
       </Grid>

@@ -13,3 +13,11 @@ export function filterObj(obj, predicate) {
 export function firstKey(obj) {
   return Object.keys(obj)[0];
 }
+
+export function normalizeList(data, key = "id") {
+  return data.reduce((acc, item) => {
+    acc[item[key]] = item;
+
+    return acc;
+  }, {});
+}

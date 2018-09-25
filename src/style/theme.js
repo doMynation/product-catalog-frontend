@@ -32,6 +32,16 @@ const theme = createMuiTheme({
   fieldError: {
     color: red[500]
   },
+  layout: {
+    pageContainer: {
+      width: '100%',
+      padding: 24,
+      paddingTop: 8,
+    },
+    sectionContainer: {
+      padding: 8,
+    }
+  }
 });
 
 export default theme;

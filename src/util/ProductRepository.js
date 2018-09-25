@@ -2,6 +2,19 @@ import {API_KEY, API_URL} from "../conf";
 import * as request from "superagent";
 
 class ProductRepository {
+  static async updateProduct(productId, fields) {
+    const url = `${this.baseUrl}/admin/products/${productId}`;
+
+    const response = await request
+      .patch(url)
+      .send({
+        fields: fields
+      })
+      .set(this._prepHeaders());
+
+    return response;
+  }
+
   static addAttributes(productIds, attributes) {
     const url = `${this.baseUrl}/admin/products-bulk/+attributes`;
     const convertedAttributes = attributes.map(att => ({...att, value: att.value + ''}));

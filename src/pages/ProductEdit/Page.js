@@ -1,20 +1,34 @@
 import React, {Component} from 'react';
 import withStyles from "@material-ui/core/es/styles/withStyles";
-import StorePicker from "./StorePicker";
 import Loading from "../../shared/Loading";
-import TagsInput from "../../shared/TagsInput";
 import ProductRepository from "../../util/ProductRepository";
-import CategoriesDropdown from "../../shared/CategoriesDropdown";
 import Tabs from "@material-ui/core/es/Tabs/Tabs";
 import Tab from "@material-ui/core/es/Tab/Tab";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import TranslationsTab from "./TranslationsTab";
-import FormControl from "@material-ui/core/es/FormControl/FormControl";
-import TextField from "@material-ui/core/es/TextField/TextField";
 import Paper from "@material-ui/core/es/Paper/Paper";
-import FormHelperText from "@material-ui/core/es/FormHelperText/FormHelperText";
-import styles from './styles';
 import PageHeader from "../../layout/PageHeader";
+import Grid from "@material-ui/core/es/Grid/Grid";
+import connect from "react-redux/es/connect/connect";
+import compose from "redux/src/compose";
+import HomeTab from "./HomeTab";
+import Section from "../../layout/Section";
+import {init, updateField} from "./index";
+import {receiveSharedData} from "../../shared/index";
+import Button from "@material-ui/core/es/Button/Button";
+import UpdateDiff from "./UpdateDiff";
+import {isEmpty} from 'lodash';
+import AttributesTab from "./AttributesTab";
+import {normalizeList} from "../../util/functions";
+
+const styles = theme => ({
+  root: {
+    ...theme.layout.pageContainer
+  },
+  tabContent: {
+    padding: theme.spacing.unit * 2
+  }
+});
 
 const availableLanguages = {
   fr: "Français",
@@ -28,10 +42,6 @@ class Page extends Component {
 
     this.state = {
       selectedTabIndex: "home",
-      tagsSuggestion: [
-        {name: "model"},
-        {name: "kmo"}
-      ],
       productId: props.match.params['productId'],
       product: null,
       isLoading: true,
@@ -39,14 +49,19 @@ class Page extends Component {
   }
 
   componentDidMount() {
-    const getProducts = () => ProductRepository.getEditData(this.state.productId);
-    const getCategories = () => ProductRepository.getProductCategories();
-    const getDepartments = () => ProductRepository.getProductDepartments();
-    const getStores = () => ProductRepository.getStores();
+    Promise.all([
+      ProductRepository.getEditData(this.state.productId),
+      ProductRepository.getProductCategories(),
+      ProductRepository.getProductDepartments(),
+      ProductRepository.getStores(),
+      ProductRepository.getAttributes()
+    ]).then(data => {
+      const [{product, translations}, categories, departments, stores, attributes] = data;
 
-    Promise.all([getProducts(), getCategories(), getDepartments(), getStores()]).then(data => {
-      const [{product, translations}, categories, departments, stores] = data;
-      const mpn = "mpn" in product ? product.mpn : "";
+      this.props.init({product, translations});
+      this.props.receiveSharedData("categories", normalizeList(categories));
+      this.props.receiveSharedData("departments", normalizeList(departments));
+      this.props.receiveSharedData("attributes", normalizeList(attributes));
 
       this.setState({
         isLoading: false,
@@ -56,11 +71,7 @@ class Page extends Component {
         product: product,
         form: {
           inputs: {
-            sku: {
-              value: product.sku,
-              isDirty: false,
-              error: ""
-            }, name: {
+            name: {
               value: product.description.name,
               isDirty: false,
               error: ""
@@ -70,38 +81,6 @@ class Page extends Component {
               error: ""
             }, longDescription: {
               value: product.description.longDescription,
-              isDirty: false,
-              error: ""
-            }, mpn: {
-              value: mpn,
-              isDirty: false,
-              error: ""
-            }, categoryId: {
-              value: product.category.id,
-              isDirty: false,
-              error: ""
-            }, departmentId: {
-              value: "TODO",
-              isDirty: false,
-              error: ""
-            }, retailPrice: {
-              value: "",
-              isDirty: false,
-              error: ""
-            }, costPrice: {
-              value: "",
-              isDirty: false,
-              error: ""
-            }, tags: {
-              value: [],
-              isDirty: false,
-              error: ""
-            }, isCustom: {
-              value: false,
-              isDirty: false,
-              error: ""
-            }, isEnabled: {
-              value: true,
               isDirty: false,
               error: ""
             }, addedStores: {
@@ -119,19 +98,6 @@ class Page extends Component {
     });
   }
 
-  isFormValid = () => {
-    const inputs = this.state.form.inputs;
-
-    for (let inputName in inputs) {
-      if (inputs[inputName].error !== "") {
-
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   setInputState = (name, value) => {
     this.setState((prevState, props) => {
       return {
@@ -144,68 +110,6 @@ class Page extends Component {
         }
       };
     });
-  }
-
-  onTagAdded = newTag => {
-    const tags = this.state.form.inputs.tags.value.concat([newTag]);
-
-    this.setInputState("tags", {
-      value: tags,
-      isDirty: true,
-      error: ""
-    });
-  }
-
-  onTagDeleted = idx => {
-    const tags = [...this.state.form.inputs.tags.value];
-    tags.splice(idx, 1);
-
-    this.setInputState("tags", {
-      value: tags,
-      isDirty: true,
-      error: ""
-    });
-  }
-
-  onInputChange = e => {
-    const inputName = e.target.name;
-    let value = e.target.value;
-
-    // Invert state for checkboxes
-    if (e.target.type === "checkbox") {
-      value = !this.state.form.inputs[inputName].value;
-    }
-
-    const error = this.validateInput(inputName, value);
-
-    this.setInputState(inputName, {
-      value: value,
-      isDirty: true,
-      error: error
-    });
-  }
-
-  validateInput = (name, value) => {
-    switch (name) {
-      case "sku":
-        if (value === "") {
-          return "Requis";
-        }
-
-        const skuRegex = /^[\w-]+$/
-        if (!skuRegex.test(value)) {
-          return "Format invalide: Charactères permis: [a-Z0-9_-]";
-        }
-        break;
-
-      case "retailPrice":
-      case "costPrice":
-        return isNaN(parseFloat(value)) ? "Prix invalide" : "";
-      default:
-        break;
-    }
-
-    return "";
   }
 
   handleAddTranslation = (translation) => {
@@ -264,25 +168,18 @@ class Page extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    let data = {};
-    for (const key in this.state.form.inputs) {
-      data[key] = this.state.form.inputs[key].value;
-    }
+    // ProductRepository
+    //   .updateProduct(this.state.productId, this.props.diff)
+    //   .then(resp => console.log("SUCCSS", resp))
+    //   .catch(err => console.log("ERR", err));
   }
 
   render = () => {
-    return (
-      <div>
-        {this.state.isLoading ?
-          <Loading/> :
-          this.renderForm()
-        }
+    const {classes} = this.props;
 
-        <h1>DEBUG</h1>
-        <div>
-          hi
-          {/*<pre>{JSON.stringify(this.state.form, null, 2)}</pre>*/}
-        </div>
+    return (
+      <div className={classes.root}>
+        {this.state.isLoading ? <Loading/> : this.renderForm()}
       </div>
     );
   }
@@ -290,14 +187,52 @@ class Page extends Component {
   renderForm = () => {
     const product = this.state.product;
     const inputs = this.state.form.inputs;
-    const isValid = this.isFormValid();
     const {selectedTabIndex} = this.state;
     const {classes} = this.props;
 
     return (
-      <div>
-        <PageHeader text={`[${product.id}] ${product.description.name}`}></PageHeader>
+      <div className={classes.root}>
+        <form onSubmit={this.handleSubmit}>
+          <Grid container spacing={16}>
+            <Grid item container xs={12} justify="space-between">
+              <PageHeader text={`[${product.id}] ${product.description.name}`}></PageHeader>
 
+              <Button variant="contained" size="small" type="submit">
+                <Icon>save</Icon>
+                Save
+              </Button>
+            </Grid>
+
+            <Grid item xs={12}>{this.renderTabs(selectedTabIndex)}</Grid>
+
+            <Grid item xs={12}>
+              <Paper className={classes.tabContent}>
+                {selectedTabIndex === "home" && <HomeTab/>}
+                {selectedTabIndex === "attributes" && <AttributesTab/>}
+                {selectedTabIndex === "translations" && <TranslationsTab
+                  translations={inputs.translations.value}
+                  onAdd={this.handleAddTranslation}
+                  onEdit={this.handleEditTranslations}
+                  onDelete={this.handleDeleteTranslation}
+                  languages={availableLanguages}
+                />}
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Section>
+                <UpdateDiff />
+              </Section>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+    );
+  }
+
+  renderTabs = selectedTabIndex => {
+    return (
+      <Section>
         <Tabs
           value={selectedTabIndex}
           onChange={(e, value) => this.setState({selectedTabIndex: value})}
@@ -310,179 +245,24 @@ class Page extends Component {
           <Tab icon={<Icon>view_comfy</Icon>} label="Attributs" value="attributes"/>
           <Tab icon={<Icon>build</Icon>} label="Composition" value="composition"/>
         </Tabs>
-
-        <form onSubmit={this.handleSubmit}>
-          <Paper className={classes.tabContent}>
-            {selectedTabIndex === "home" && this.renderHomeTab()}
-            {selectedTabIndex === "translations" && <TranslationsTab
-              translations={inputs.translations.value}
-              onAdd={this.handleAddTranslation}
-              onEdit={this.handleEditTranslations}
-              onDelete={this.handleDeleteTranslation}
-              languages={availableLanguages}
-            />}
-          </Paper>
-
-          <h3>Prix et disponibilité</h3>
-          <div>
-            <label htmlFor="retailPrice">Prix de détail</label>
-            <input type="text" id="retailPrice" name="retailPrice" onChange={this.onInputChange}/>
-            {inputs.retailPrice.error === "" ? '' : <span className="input-error">{inputs.retailPrice.error}</span>}
-          </div>
-
-          <div>
-            <label htmlFor="costPrice">Prix coûtant</label>
-            <input type="text" id="costPrice" name="costPrice" onChange={this.onInputChange}/>
-            {inputs.costPrice.error === "" ? '' : <span className="input-error">{inputs.costPrice.error}</span>}
-          </div>
-
-          <StorePicker
-            stores={this.state.stores}
-            handleAdd={this.handleAddStore}
-            handleDelete={this.handleDeleteStore}
-            addedStores={this.state.form.inputs.addedStores.value}/>
-
-          <br/>
-          <br/>
-          <br/>
-
-          <div>
-            <label htmlFor="isCustom">Produit sur mesure</label>
-            <input type="checkbox" id="isCustom" name="isCustom" defaultChecked={inputs.isCustom.value} onChange={this.onInputChange}/>
-          </div>
-
-          <div>
-            <label htmlFor="isEnabled">Activé</label>
-            <input type="checkbox" id="isEnabled" name="isEnabled" defaultChecked={inputs.isEnabled.value} onChange={this.onInputChange}/>
-          </div>
-
-          <div>
-            <button type="submit" disabled={!isValid}>
-              <i className="fas fa-save"></i>
-              &nbsp;
-              Sauvegarder
-            </button>
-          </div>
-        </form>
-      </div>
-    )
-  }
-
-  renderHomeTab = () => {
-    const inputs = this.state.form.inputs;
-    const {classes} = this.props;
-
-    return (
-      <React.Fragment>
-        <div className={classes.container}>
-          <FormControl className={classes.formControl}>
-            <TextField
-              error={inputs.sku.error !== ""}
-              label="SKU"
-              id="sku"
-              name="sku"
-              onChange={this.onInputChange}
-              value={inputs.sku.value}
-            />
-            {inputs.sku.error !== "" && <FormHelperText error>{inputs.sku.error}</FormHelperText>}
-          </FormControl>
-
-          <FormControl className={classes.formControl}>
-            <TextField
-              error={inputs.mpn.error !== ""}
-              label="MPN"
-              id="mpn"
-              name="mpn"
-              onChange={this.onInputChange}
-              value={inputs.mpn.value}
-            />
-            {inputs.mpn.error !== "" && <FormHelperText error>{inputs.mpn.error}</FormHelperText>}
-          </FormControl>
-        </div>
-
-        <FormControl fullWidth>
-          <TextField
-            error={inputs.name.error !== ""}
-            label="Nom"
-            id="name"
-            name="name"
-            onChange={this.onInputChange}
-            value={inputs.name.value}
-          />
-          {inputs.name.error !== "" && <FormHelperText error>{inputs.name.error}</FormHelperText>}
-        </FormControl>
-
-        <FormControl>
-          <TextField
-            error={inputs.shortDescription.error !== ""}
-            label="Description (Courte)"
-            id="shortDescription"
-            name="shortDescription"
-            onChange={this.onInputChange}
-            value={inputs.shortDescription.value}
-            multiline
-            rowsMax="4"
-          />
-          {inputs.shortDescription.error !== "" &&
-          <FormHelperText error>{inputs.shortDescription.error}</FormHelperText>}
-        </FormControl>
-
-        {'     '}
-
-        <FormControl>
-          <TextField
-            error={inputs.longDescription.error !== ""}
-            label="Description (Longue)"
-            id="longDescription"
-            name="longDescription"
-            onChange={this.onInputChange}
-            value={inputs.longDescription.value}
-            multiline
-            rowsMax="4"
-          />
-          {inputs.longDescription.error === "" && <FormHelperText error>{inputs.longDescription.error}</FormHelperText>}
-        </FormControl>
-
-
-        <hr/>
-
-        <div>
-          <CategoriesDropdown
-            categories={this.state.categories}
-            onChange={this.onInputChange}
-            value={inputs.categoryId.value}
-            id="categoryId"
-            name="categoryId"
-            label="Catégorie"
-            helpText="La catégorie du produit"
-          />
-
-          {inputs.categoryId.error === "" ? '' : <span className="input-error">{inputs.categoryId.error}</span>}
-        </div>
-
-        <div>
-          <label htmlFor="departmentId">Département: </label>
-          <select name="departmentId" id="departmentId" value={inputs.departmentId.value} onChange={this.onInputChange}>
-            {this.state.departments.map(dept =>
-              <option key={dept.id} value={dept.id}>{dept.name}</option>)
-            }
-          </select>
-          {inputs.departmentId.error === "" ? '' : <span className="input-error">{inputs.departmentId.error}</span>}
-        </div>
-
-        <div>
-          <label htmlFor="">Balises:</label>
-          <TagsInput
-            tags={inputs.tags.value}
-            suggestions={this.state.tagsSuggestion}
-            addHandler={this.onTagAdded}
-            deleteHandler={this.onTagDeleted}
-            allowNew={true}
-          />
-        </div>
-      </React.Fragment>
+      </Section>
     );
   }
 }
 
-export default withStyles(styles)(Page);
+const mstp = ({shared, productEdit}) => ({
+  categories: shared.data.categories,
+  attributes: shared.data.attributes,
+  fields: productEdit.fields,
+});
+
+const mdtp = dispatch => ({
+  init: data => dispatch(init(data)),
+  receiveSharedData: (name, data) => dispatch(receiveSharedData(name, data)),
+  updateField: (fieldName, value, error) => dispatch(updateField(fieldName, value, error))
+});
+
+export default compose(
+  withStyles(styles),
+  connect(mstp, mdtp)
+)(Page);

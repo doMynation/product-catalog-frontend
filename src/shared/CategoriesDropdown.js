@@ -11,37 +11,34 @@ const styles = theme => ({});
 
 class CategoriesDropdown extends React.PureComponent {
   render() {
-    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", containerClass = "", ...others} = this.props;
+    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", containerClass = "", selectAll = false, ...others} = this.props;
 
     return (
-      <React.Fragment>
-        <FormControl className={containerClass}>
-          <InputLabel htmlFor={id}>{label}</InputLabel>
-          <Select
-            value={value}
-            onChange={onChange}
-            inputProps={{
-              id: id,
-              name: name,
-            }}
-            {...others}
-          >
-            <MenuItem value="">
-              <em>Toutes</em>
-            </MenuItem>
-            {categories.map((category, idx) => (
-              <MenuItem key={idx} value={category.code}>{'\u00A0\u00A0'.repeat(category.depth - 1)}{category.description.name}</MenuItem>
-            ))}
-          </Select>
-          {helpText !== "" && <FormHelperText>{helpText}</FormHelperText>}
-        </FormControl>
-      </React.Fragment>
+      <FormControl className={containerClass}>
+        <InputLabel htmlFor={id}>{label}</InputLabel>
+        <Select
+          value={value}
+          onChange={onChange}
+          inputProps={{
+            id: id,
+            name: name,
+          }}
+          {...others}
+        >
+          {selectAll !== false && <MenuItem value=""><em>Toutes</em></MenuItem>}
+
+          {Object.entries(categories).map(([idx, category]) => (
+            <MenuItem key={idx} value={category.id}>{'\u00A0\u00A0'.repeat(category.depth - 1)}{category.description.name}</MenuItem>
+          ))}
+        </Select>
+        {helpText !== "" && <FormHelperText>{helpText}</FormHelperText>}
+      </FormControl>
     );
   }
 }
 
 CategoriesDropdown.propTypes = {
-  categories: PropTypes.array.isRequired,
+  categories: PropTypes.objectOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any.isRequired,
   label: PropTypes.string.isRequired,

@@ -27,6 +27,11 @@ const Menu = ({isOpen, onClose}) => (
           <ListItemIcon><Icon>search</Icon></ListItemIcon>
           <ListItemText primary="Produits"/>
         </ListItem>
+
+        <ListItem button component={Link} to="/create-product">
+          <ListItemIcon><Icon>add</Icon></ListItemIcon>
+          <ListItemText primary="Créer un produit"/>
+        </ListItem>
       </List>
     </div>
   </Drawer>

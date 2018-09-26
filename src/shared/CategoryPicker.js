@@ -9,12 +9,12 @@ import FormHelperText from "@material-ui/core/es/FormHelperText/FormHelperText";
 
 const styles = theme => ({});
 
-class CategoriesDropdown extends React.PureComponent {
+class CategoryPicker extends React.PureComponent {
   render() {
-    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", containerClass = "", selectAll = false, ...others} = this.props;
+    const {categories, value, onChange, label = "", helpText = "", id = "", name = "", containerClass = "", selectAll = false, formControlProps = {}, ...others} = this.props;
 
     return (
-      <FormControl className={containerClass}>
+      <FormControl className={containerClass} {...formControlProps}>
         <InputLabel htmlFor={id}>{label}</InputLabel>
         <Select
           value={value}
@@ -37,7 +37,7 @@ class CategoriesDropdown extends React.PureComponent {
   }
 }
 
-CategoriesDropdown.propTypes = {
+CategoryPicker.propTypes = {
   categories: PropTypes.objectOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any.isRequired,
@@ -47,4 +47,4 @@ CategoriesDropdown.propTypes = {
   containerClass: PropTypes.string,
 };
 
-export default withStyles(styles)(CategoriesDropdown);
+export default withStyles(styles)(CategoryPicker);

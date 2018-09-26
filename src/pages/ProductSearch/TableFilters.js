@@ -18,7 +18,7 @@ import Switch from "@material-ui/core/es/Switch/Switch";
 import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
 import FormGroup from "@material-ui/core/es/FormGroup/FormGroup";
 import FormLabel from "@material-ui/core/es/FormLabel/FormLabel";
-import CategoriesDropdown from "../../shared/CategoriesDropdown";
+import CategoryPicker from "../../shared/CategoryPicker";
 
 const styles = theme => ({
   colorSwitchBase: {
@@ -132,7 +132,7 @@ class TableFilters extends React.PureComponent {
               onChange={e => this.handleFilterChange(e, true)}
             />
 
-            <CategoriesDropdown
+            <CategoryPicker
               categories={this.props.categories}
               onChange={this.handleFilterChange}
               value={this.state.categoryId}

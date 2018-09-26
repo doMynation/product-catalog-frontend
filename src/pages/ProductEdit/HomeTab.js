@@ -7,7 +7,7 @@ import FormHelperText from "@material-ui/core/es/FormHelperText/FormHelperText";
 import FormControl from "@material-ui/core/es/FormControl/FormControl";
 import {updateField} from "./index";
 import connect from "react-redux/es/connect/connect";
-import CategoriesDropdown from "../../shared/CategoriesDropdown";
+import CategoryPicker from "../../shared/CategoryPicker";
 import ReactTags from 'react-tag-autocomplete'
 import 'react-tag-autocomplete/example/styles.css'
 import InputLabel from "@material-ui/core/es/InputLabel/InputLabel";
@@ -16,6 +16,8 @@ import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import InputAdornment from "@material-ui/core/es/InputAdornment/InputAdornment";
 import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
 import Switch from "@material-ui/core/es/Switch/Switch";
+import Grid from "@material-ui/core/es/Grid/Grid";
+import Typography from "@material-ui/core/es/Typography/Typography";
 
 const styles = theme => ({
   switches: {
@@ -69,151 +71,197 @@ class HomeTab extends Component {
     const tags = fields.tags.value.map(tag => ({name: tag}));
 
     return (
-      <div>
-        <FormControl fullWidth>
-          <TextField
-            fullWidth
-            error={fields.sku.error !== ""}
-            label="SKU"
-            id="sku"
-            name="sku"
-            onChange={this.handleChange}
-            value={fields.sku.value}
+      <Grid container spacing={24}>
+        <Grid item xs={12}>
+          <Typography variant="title">Accueil</Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <Grid container spacing={24}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  error={fields.sku.error !== ""}
+                  label="SKU"
+                  id="sku"
+                  name="sku"
+                  onChange={this.handleChange}
+                  value={fields.sku.value}
+                />
+                {fields.sku.error && <FormHelperText error>{fields.sku.error}</FormHelperText>}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <TextField
+                  error={fields.mpn.error !== ""}
+                  label="MPN"
+                  id="mpn"
+                  name="mpn"
+                  onChange={this.handleChange}
+                  value={fields.mpn.value}
+                />
+                {fields.mpn.error && <FormHelperText error>{fields.mpn.error}</FormHelperText>}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <TextField
+                  id="name"
+                  name="name"
+                  label="Nom"
+                  value={fields.name.value}
+                  onChange={this.handleChange}
+                  error={fields.name.error !== ""}
+                />
+                {fields.name.error && <FormHelperText error>{fields.name.error}</FormHelperText>}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={5}>
+              <CategoryPicker
+                id="categoryId"
+                name="categoryId"
+                label="Catégorie"
+                value={fields.categoryId.value}
+                categories={categories}
+                containerClass={classes.formControl}
+                formControlProps={{fullWidth: true}}
+                onChange={event => {
+                  const {name, value} = event.target;
+                  updateField(name, value);
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={5}>
+              <FormControl className={classes.formControl} fullWidth>
+                <InputLabel htmlFor="input-department">Département</InputLabel>
+                <Select
+                  value={fields.departmentId.value}
+                  onChange={event => {
+                    const {name, value} = event.target;
+                    updateField(name, value);
+                  }}
+                  inputProps={{
+                    id: 'departmentId',
+                    name: 'departmentId',
+                  }}>
+                  {Object.entries(departments).map(([idx, department]) => (
+                    <MenuItem key={idx} value={department.code}>{department.description.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography variant="caption" paragraph>
+                La <strong>catégorie</strong> correspond au <strong>type du produit</strong>. Par exemple, une vis fait partie de la catégorie Quincaillerie.
+              </Typography>
+              <Typography variant="caption" paragraph>
+                Le <strong>départment</strong> correspond au département qui <strong>gère le produit au niveau de la production</strong>. Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
+              </Typography>
+              <Typography variant="caption" paragraph>
+                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun. Prenons l'exemple du DVD d'installation, dont la <strong>catégorie est Documentation</strong> et le <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              id="shortDescription"
+              name="shortDescription"
+              label="Description (Courte)"
+              value={fields.shortDescription.value}
+              onChange={this.handleChange}
+              error={fields.shortDescription.error !== ""}
+              multiline
+              rowsMax="4"
+            />
+            {fields.shortDescription.error && <FormHelperText error>{fields.shortDescription.error}</FormHelperText>}
+          </FormControl>
+
+          <FormControl fullWidth>
+            <TextField
+              id="longDescription"
+              name="longDescription"
+              label="Description (Longue)"
+              value={fields.longDescription.value}
+              onChange={this.handleChange}
+              error={fields.longDescription.error !== ""}
+              multiline
+              rowsMax="4"
+            />
+            {fields.longDescription.error &&
+            <FormHelperText error>{fields.longDescription.error}</FormHelperText>}
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={6}>
+          <ReactTags
+            tags={tags}
+            suggestions={tagSuggestion}
+            handleAddition={this.handleAddTag}
+            handleDelete={this.handleDeleteTag}
+            allowNew={true}
+            autofocus={false}
+            placeholder="Étiquettes ..."
           />
-          {fields.sku.error && <FormHelperText error>{fields.sku.error}</FormHelperText>}
-        </FormControl>
+        </Grid>
 
-        <FormControl fullWidth>
-          <TextField
-            error={fields.mpn.error !== ""}
-            label="MPN"
-            id="mpn"
-            name="mpn"
-            onChange={this.handleChange}
-            value={fields.mpn.value}
-          />
-          {fields.mpn.error && <FormHelperText error>{fields.mpn.error}</FormHelperText>}
-        </FormControl>
+        <Grid item xs={12}>
+          <Typography variant="title">Prix et disponibilité</Typography>
+        </Grid>
 
-        <FormControl fullWidth>
-          <TextField
-            id="name"
-            name="name"
-            label="Nom"
-            value={fields.name.value}
-            onChange={this.handleChange}
-            error={fields.name.error !== ""}
-          />
-          {fields.name.error && <FormHelperText error>{fields.name.error}</FormHelperText>}
-        </FormControl>
+        <Grid item xs={12}>
+          <Grid container spacing={24}>
+            <Grid item xs={3}>
+              <FormControl fullWidth>
+                <TextField
+                  id="price"
+                  name="price"
+                  label="Prix de détail"
+                  value={fields.price.value}
+                  type="number"
+                  onChange={this.handleChange}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  }}
+                  error={fields.price.error !== ""}
+                />
+                {fields.price.error && <FormHelperText error>{fields.price.error}</FormHelperText>}
+              </FormControl>
+            </Grid>
 
-        <FormControl fullWidth>
-          <TextField
-            id="shortDescription"
-            name="shortDescription"
-            label="Description (Courte)"
-            value={fields.shortDescription.value}
-            onChange={this.handleChange}
-            error={fields.shortDescription.error !== ""}
-            multiline
-            rowsMax="4"
-          />
-          {fields.shortDescription.error && <FormHelperText error>{fields.shortDescription.error}</FormHelperText>}
-        </FormControl>
+            <Grid item xs={3}>
+              <FormControl fullWidth>
+                <TextField
+                  id="costPrice"
+                  name="costPrice"
+                  label="Prix coûtant"
+                  value={fields.costPrice.value}
+                  type="number"
+                  onChange={this.handleChange}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  }}
+                  error={fields.costPrice.error !== ""}
+                />
+                {fields.costPrice.error && <FormHelperText error>{fields.costPrice.error}</FormHelperText>}
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Grid>
 
-        <FormControl fullWidth>
-          <TextField
-            id="longDescription"
-            name="longDescription"
-            label="Description (Longue)"
-            value={fields.longDescription.value}
-            onChange={this.handleChange}
-            error={fields.longDescription.error !== ""}
-            multiline
-            rowsMax="4"
-          />
-          {fields.longDescription.error &&
-          <FormHelperText error>{fields.longDescription.error}</FormHelperText>}
-        </FormControl>
-
-        <CategoriesDropdown
-          id="categoryId"
-          name="categoryId"
-          label="Catégorie"
-          value={fields.categoryId.value}
-          categories={categories}
-          containerClass={classes.formControl}
-          onChange={event => {
-            const {name, value} = event.target;
-            updateField(name, value);
-          }}
-        />
-
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="input-department">Département</InputLabel>
-          <Select
-            value={fields.departmentId.value}
-            onChange={event => {
-              const {name, value} = event.target;
-              updateField(name, value);
-            }}
-            inputProps={{
-              id: 'departmentId',
-              name: 'departmentId',
-            }}>
-            {Object.entries(departments).map(([idx, department]) => (
-              <MenuItem key={idx} value={department.code}>{department.description.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <ReactTags
-          tags={tags}
-          suggestions={tagSuggestion}
-          handleAddition={this.handleAddTag}
-          handleDelete={this.handleDeleteTag}
-          allowNew={true}
-          autofocus={false}
-        />
-
-        <h3>Prix et disponibilité</h3>
-        <FormControl>
-          <TextField
-            id="price"
-            name="price"
-            label="Prix de détail"
-            value={fields.price.value}
-            type="number"
-            onChange={this.handleChange}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">$</InputAdornment>,
-            }}
-            error={fields.price.error !== ""}
-          />
-          {fields.price.error && <FormHelperText error>{fields.price.error}</FormHelperText>}
-        </FormControl>
-
-        <FormControl>
-          <TextField
-            id="costPrice"
-            name="costPrice"
-            label="Prix coûtant"
-            value={fields.costPrice.value}
-            type="number"
-            onChange={this.handleChange}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">$</InputAdornment>,
-            }}
-            error={fields.costPrice.error !== ""}
-          />
-          {fields.costPrice.error && <FormHelperText error>{fields.costPrice.error}</FormHelperText>}
-        </FormControl>
-
-        <br/>
-        <br/>
-
-        {this.renderToggles()}
-      </div>
+        <Grid item xs={12}>
+          {this.renderToggles()}
+        </Grid>
+      </Grid>
     );
   }
 

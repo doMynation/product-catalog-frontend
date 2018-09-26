@@ -17,7 +17,6 @@ import {init, updateField} from "./index";
 import {receiveSharedData} from "../../shared/index";
 import Button from "@material-ui/core/es/Button/Button";
 import UpdateDiff from "./UpdateDiff";
-import {isEmpty} from 'lodash';
 import AttributesTab from "./AttributesTab";
 import {normalizeList} from "../../util/functions";
 

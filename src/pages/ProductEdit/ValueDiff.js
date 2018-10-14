@@ -4,6 +4,7 @@ import withStyles from "@material-ui/core/es/styles/withStyles";
 import red from "@material-ui/core/es/colors/red";
 import green from "@material-ui/core/es/colors/green";
 import Icon from "@material-ui/core/es/Icon/Icon";
+import Typography from "@material-ui/core/es/Typography/Typography";
 
 const styles = theme => ({
   root: {
@@ -12,6 +13,7 @@ const styles = theme => ({
   },
   label: {
     padding: 4,
+    fontWeight: 'bold'
   },
   before: {
     padding: 4,
@@ -32,17 +34,20 @@ const styles = theme => ({
 
 const ValueDiff = ({label, before, after, classes}) => (
   <div className={classes.root}>
-    <span className={classes.label}>{label}:</span>
-    <span className={classes.before}>{before}</span>
-    <span className={classes.arrow}><Icon>arrow_right_alt</Icon></span>
-    <span className={classes.after}>{after}</span>
+    <Typography variant="caption"><span className={classes.label}>{label}:</span></Typography>
+    {before !== undefined &&
+    <Typography variant="caption"><span className={classes.before}>{before}</span></Typography>}
+    {before !== undefined && after !== undefined &&
+    <Typography variant="caption"><span className={classes.arrow}><Icon>arrow_right_alt</Icon></span></Typography>}
+    {after !== undefined &&
+    <Typography variant="caption"><span className={classes.after}>{after}</span></Typography>}
   </div>
 );
 
 ValueDiff.propTypes = {
   label: PropTypes.string.isRequired,
-  before: PropTypes.any.isRequired,
-  after: PropTypes.any.isRequired,
+  before: PropTypes.string,
+  after: PropTypes.string,
 }
 
 export default withStyles(styles)(ValueDiff);

@@ -4,12 +4,50 @@ import withStyles from "@material-ui/core/es/styles/withStyles";
 import ValueDiff from "./ValueDiff";
 import compose from "redux/src/compose";
 import connect from "react-redux/es/connect/connect";
+import {isEqual} from "lodash";
+import AttributesDiff from "./AttributesDiff";
 
 const styles = theme => ({});
 
 class UpdateDiff extends React.PureComponent {
+  compareAttributes = (oldAttributes, newAttributes) => {
+    if (oldAttributes === newAttributes) {
+      return "";
+    }
+
+    if (isEqual(oldAttributes, newAttributes)) {
+      return "";
+    }
+
+    let updated = [];
+    let deleted = [];
+
+    oldAttributes.forEach(oldAttr => {
+      const newAttr = newAttributes.find(newAttr => newAttr.id === oldAttr.id);
+
+      if (newAttr) {
+        // Compare
+        if (!isEqual(oldAttr, newAttr))
+          updated.push([oldAttr, newAttr]);
+      } else {
+        deleted.push(oldAttr);
+      }
+    });
+
+    const added = newAttributes.filter(newAttr => oldAttributes.findIndex(oldAttr => oldAttr.id === newAttr.id) === -1);
+
+    if (!added.length && !updated.length && !deleted.length) return "";
+
+    return <AttributesDiff
+      key={`attr-diff-${added.length}-${updated.length}-${deleted.length}`}
+      added={added}
+      updated={updated}
+      deleted={deleted}
+    />
+  }
+
   computeDiff = field => {
-    if (field.label === "Attributs") return false
+    if (field.label === "Attributs") return false;
 
     const hasError = field.checkError === undefined ? false : field.checkError && field.error !== "";
 
@@ -22,6 +60,14 @@ class UpdateDiff extends React.PureComponent {
     return (
       <div>
         {Object.entries(fields).map(([key, field]) => {
+          if (key === "translations") {
+            return "";
+          }
+
+          if (key === "attributes") {
+            return this.compareAttributes(field.oldValue, field.value);
+          }
+
           const diff = this.computeDiff(field);
           let oldValue = null;
           let newValue = null;

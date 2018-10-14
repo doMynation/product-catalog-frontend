@@ -6,7 +6,7 @@ export const sku = value => {
   }
 
   return "";
-}
+};
 
 export const price = value => {
   if (!/^[\d.]+$/.test(value)) {
@@ -14,23 +14,7 @@ export const price = value => {
   }
 
   return "";
-}
-
-export const compareBooleans = (booleanValue, stringValue) => {
-  const booleanStringValue = stringValue === "1";
-
-  return booleanValue === booleanStringValue;
-}
-
-export const compareArrays = (a, b) => {
-  if (a.length !== b.length) return false;
-
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-
-  return true;
-}
+};
 
 export const validate = (value, field) => {
   if (field.validators === undefined || !field.validators.length) {

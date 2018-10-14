@@ -132,9 +132,24 @@ const components = {
   Menu,
 };
 
-class AutoComplete extends React.PureComponent {
+class AutoComplete extends React.Component {
+  state = {
+    value: ""
+  };
+
+  onChange = value => {
+    // Fixes bug when pressing backspace when the autocomplete input is empty
+    if (value === undefined || value.length === 0) {
+      return;
+    }
+
+    this.props.onChange(value);
+
+    this.setState({value: value});
+  }
+
   render() {
-    const {classes, theme, options, onChange, placeholder = ""} = this.props;
+    const {classes, theme, options, placeholder = "", clearOnSelect = false} = this.props;
     const selectStyles = {
       input: base => ({
         ...base,
@@ -149,9 +164,9 @@ class AutoComplete extends React.PureComponent {
           styles={selectStyles}
           options={options}
           components={components}
-          onChange={onChange}
+          onChange={this.onChange}
           placeholder={placeholder}
-          value={""}
+          value={clearOnSelect ? "" : this.state.value}
           autoFocus
         />
       </div>
@@ -162,7 +177,8 @@ class AutoComplete extends React.PureComponent {
 AutoComplete.propTypes = {
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
-  placeholder: PropTypes.string
+  placeholder: PropTypes.string,
+  clearOnSelect: PropTypes.bool
 };
 
 export default withStyles(styles, {withTheme: true})(AutoComplete);

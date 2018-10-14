@@ -94,11 +94,6 @@ class AttributePicker extends Component {
   }
 
   handleAdd = selection => {
-    // Fixes bug when pressing backspace when the autocomplete input is empty
-    if (selection === undefined || selection.length === 0) {
-      return;
-    }
-
     const attribute = this.props.availableAttributes[selection.value];
     const newAttribute = {
       id: selection.value,
@@ -176,6 +171,7 @@ class AttributePicker extends Component {
               onChange={this.handleAdd}
               options={options}
               placeholder="Tapez le nom d'un attribut ..."
+              clearOnSelect={true}
             />
 
             <div className={classes.header}>

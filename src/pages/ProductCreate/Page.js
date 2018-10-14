@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import PageHeader from "../../layout/PageHeader";
 import Grid from "@material-ui/core/es/Grid/Grid";

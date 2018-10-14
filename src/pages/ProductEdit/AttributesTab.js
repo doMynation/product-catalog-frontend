@@ -7,30 +7,26 @@ import AttributePicker from "../../shared/AttributePicker/AttributePicker";
 import {updateField} from "./index";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Typography from "@material-ui/core/es/Typography/Typography";
+import Icon from "@material-ui/core/es/Icon/Icon";
 
 const styles = theme => ({});
 
-class AttributesTab extends React.Component {
-  render() {
-    const {availableAttributes, selectedAttributes, updateField} = this.props;
+const AttributesTab = ({availableAttributes, selectedAttributes, updateField}) => (
+  <Grid container spacing={24}>
+    <Grid item xs={12}>
+      <Typography variant="title" gutterBottom><Icon fontSize="inherit">language</Icon> Attributs</Typography>
+      <Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda consequuntur deleniti dolorem, doloremque dolores ex facere in ipsum iure minus molestiae non nulla quam quas quia sed sint veritatis voluptatem.</Typography>
+    </Grid>
 
-    return (
-      <Grid container spacing={24}>
-        <Grid item xs={12}>
-          <Typography variant="title">Attributs</Typography>
-        </Grid>
-
-        <Grid item xs={12}>
-          <AttributePicker
-            availableAttributes={availableAttributes}
-            selectedAttributes={selectedAttributes}
-            onChange={newAttributes => updateField("attributes", newAttributes)}
-          />
-        </Grid>
-      </Grid>
-    );
-  }
-}
+    <Grid item xs={12}>
+      <AttributePicker
+        availableAttributes={availableAttributes}
+        selectedAttributes={selectedAttributes}
+        onChange={newAttributes => updateField("attributes", newAttributes)}
+      />
+    </Grid>
+  </Grid>
+);
 
 AttributesTab.propTypes = {
   availableAttributes: PropTypes.objectOf(PropTypes.object),

@@ -49,6 +49,7 @@ class AttributeInput extends React.Component {
 
     if (["angle", "int", "money"].includes(attribute.dataType)) {
       props.type = "number";
+      props.onFocus = e => e.target.select();
     }
 
     if (attribute.dataType === "angle") {
@@ -78,6 +79,7 @@ class AttributeInput extends React.Component {
           label={attribute.description.name}
           value={value}
           onChange={this.handleChange}
+          onFocus={e => e.target.select()}
           type="number"
           InputProps={{
             startAdornment: <InputAdornment position="start">Po</InputAdornment>,

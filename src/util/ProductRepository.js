@@ -5,14 +5,18 @@ class ProductRepository {
   static async updateProduct(productId, fields) {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 
-    const response = await request
-      .patch(url)
+    // Curate the data in the proper format
+    fields.metadata = {
+      mpn: fields.mpn,
+      isKit: fields.isKit ? "1" : "0",
+    };
+
+    return await request
+      .put(url)
       .send({
         fields: fields
       })
       .set(this._prepHeaders());
-
-    return response;
   }
 
   static addAttributes(productIds, attributes) {
@@ -77,7 +81,7 @@ class ProductRepository {
     offset = offset || 0;
     limit = limit || null;
 
-    var params = Object.assign({}, {
+    const params = Object.assign({}, {
       lang: "fr",
       offset: offset
     }, filters);
@@ -90,7 +94,7 @@ class ProductRepository {
       params.limit = limit;
     }
 
-    const queryStringParams = Object.keys(params).map((key, idx) => {
+    const queryStringParams = Object.keys(params).map(key => {
       return `${key}=${params[key]}`;
     }).join("&");
 

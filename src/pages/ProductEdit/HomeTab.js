@@ -18,6 +18,7 @@ import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlL
 import Switch from "@material-ui/core/es/Switch/Switch";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Typography from "@material-ui/core/es/Typography/Typography";
+import Icon from "@material-ui/core/es/Icon/Icon";
 
 const styles = theme => ({
   switches: {
@@ -33,6 +34,10 @@ const styles = theme => ({
   },
   colorBar: {},
   colorChecked: {},
+  image: {},
+  imageContainer: {
+    textAlign: 'center'
+  }
 });
 
 const tagSuggestion = ["model", "kmo"].map(name => ({name: name}));
@@ -57,6 +62,22 @@ class HomeTab extends Component {
     this.props.updateField(name, value);
   }
 
+  handleNameChange = e => {
+    const {value} = e.target;
+
+    const newTranslations = this.props.fields.translations.value.reduce((acc, tr) => {
+      if (tr.isDefault) {
+        tr.name = value
+      }
+
+      acc.push(tr);
+
+      return acc;
+    }, []);
+
+    this.props.updateField("translations", newTranslations);
+  }
+
   handleSwitchChange = e => {
     const {name} = e.target;
 
@@ -69,11 +90,12 @@ class HomeTab extends Component {
   render() {
     const {fields, classes, updateField, categories, departments} = this.props;
     const tags = fields.tags.value.map(tag => ({name: tag}));
+    const defaultTranslationIdx = fields.translations.value.findIndex(tr => tr.isDefault);
 
     return (
       <Grid container spacing={24}>
         <Grid item xs={12}>
-          <Typography variant="title">Accueil</Typography>
+          <Typography variant="title"><Icon>home</Icon> Accueil</Typography>
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -81,9 +103,24 @@ class HomeTab extends Component {
             <Grid item xs={12}>
               <FormControl fullWidth>
                 <TextField
+                  id="name"
+                  name="name"
+                  label="Nom *"
+                  value={fields.translations.value[defaultTranslationIdx].name}
+                  onChange={this.handleNameChange}
+                  error={Boolean(fields.translations.error[defaultTranslationIdx])}
+                />
+                {fields.translations.error[defaultTranslationIdx] !== "" &&
+                <FormHelperText error>{fields.translations.error[defaultTranslationIdx]}</FormHelperText>}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <TextField
                   fullWidth
                   error={fields.sku.error !== ""}
-                  label="SKU"
+                  label="SKU *"
                   id="sku"
                   name="sku"
                   onChange={this.handleChange}
@@ -93,7 +130,7 @@ class HomeTab extends Component {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <FormControl fullWidth>
                 <TextField
                   error={fields.mpn.error !== ""}
@@ -107,21 +144,7 @@ class HomeTab extends Component {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <TextField
-                  id="name"
-                  name="name"
-                  label="Nom"
-                  value={fields.name.value}
-                  onChange={this.handleChange}
-                  error={fields.name.error !== ""}
-                />
-                {fields.name.error && <FormHelperText error>{fields.name.error}</FormHelperText>}
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <CategoryPicker
                 id="categoryId"
                 name="categoryId"
@@ -137,7 +160,7 @@ class HomeTab extends Component {
               />
             </Grid>
 
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <FormControl className={classes.formControl} fullWidth>
                 <InputLabel htmlFor="input-department">Département</InputLabel>
                 <Select
@@ -151,7 +174,7 @@ class HomeTab extends Component {
                     name: 'departmentId',
                   }}>
                   {Object.entries(departments).map(([idx, department]) => (
-                    <MenuItem key={idx} value={department.code}>{department.description.name}</MenuItem>
+                    <MenuItem key={idx} value={department.id}>{department.description.name}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -159,47 +182,24 @@ class HomeTab extends Component {
 
             <Grid item xs={12}>
               <Typography variant="caption" paragraph>
-                La <strong>catégorie</strong> correspond au <strong>type du produit</strong>. Par exemple, une vis fait partie de la catégorie Quincaillerie.
+                La <strong>catégorie</strong> correspond au
+                <strong>type du produit</strong>. Par exemple, une vis fait partie de la catégorie Quincaillerie.
               </Typography>
               <Typography variant="caption" paragraph>
-                Le <strong>départment</strong> correspond au département qui <strong>gère le produit au niveau de la production</strong>. Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
+                Le <strong>départment</strong> correspond au département qui
+                <strong>gère le produit au niveau de la production</strong>. Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
               </Typography>
               <Typography variant="caption" paragraph>
-                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun. Prenons l'exemple du DVD d'installation, dont la <strong>catégorie est Documentation</strong> et le <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
+                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun. Prenons l'exemple du DVD d'installation, dont la
+                <strong>catégorie est Documentation</strong> et le
+                <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
               </Typography>
             </Grid>
           </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <TextField
-              id="shortDescription"
-              name="shortDescription"
-              label="Description (Courte)"
-              value={fields.shortDescription.value}
-              onChange={this.handleChange}
-              error={fields.shortDescription.error !== ""}
-              multiline
-              rowsMax="4"
-            />
-            {fields.shortDescription.error && <FormHelperText error>{fields.shortDescription.error}</FormHelperText>}
-          </FormControl>
-
-          <FormControl fullWidth>
-            <TextField
-              id="longDescription"
-              name="longDescription"
-              label="Description (Longue)"
-              value={fields.longDescription.value}
-              onChange={this.handleChange}
-              error={fields.longDescription.error !== ""}
-              multiline
-              rowsMax="4"
-            />
-            {fields.longDescription.error &&
-            <FormHelperText error>{fields.longDescription.error}</FormHelperText>}
-          </FormControl>
+        <Grid item xs={12} sm={6} className={classes.imageContainer}>
+          <img src="https://picsum.photos/200/300/?random" alt="Aucune" className={classes.image}/>
         </Grid>
 
         <Grid item xs={6}>
@@ -229,6 +229,7 @@ class HomeTab extends Component {
                   value={fields.price.value}
                   type="number"
                   onChange={this.handleChange}
+                  onFocus={e => e.target.select()}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
@@ -247,6 +248,7 @@ class HomeTab extends Component {
                   value={fields.costPrice.value}
                   type="number"
                   onChange={this.handleChange}
+                  onFocus={e => e.target.select()}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}

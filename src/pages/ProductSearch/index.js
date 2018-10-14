@@ -57,7 +57,7 @@ export const cloneProduct = productId => {
         dispatch({type: CLONE_ERROR, message: err.message});
       });
   };
-}
+};
 
 export const bulkAddAttributes = attributes => {
   return (dispatch, getState) => {
@@ -82,7 +82,7 @@ export const bulkAddAttributes = attributes => {
       })
       .catch(err => dispatch({type: BULK_ACTION_ERROR}));
   }
-}
+};
 
 export const bulkEnableProduct = () => {
   return (dispatch, getState) => {
@@ -195,7 +195,6 @@ export const performSearch = () => {
         dispatch(receiveResults(searchResult.results, searchResult.totalCount));
       })
       .catch(err => {
-        console.log("hmm what", err.response);
         if (err.timeout) {
           console.log("handle timeout");
         } else if (!("response" in err)) {

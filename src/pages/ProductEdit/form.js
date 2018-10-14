@@ -12,22 +12,6 @@ export default {
     init: product => product.metadata.mpn,
     checkError: true
   },
-  name: {
-    label: "Nom",
-    init: product => product.description.name,
-    validators: [required],
-    checkError: true
-  },
-  shortDescription: {
-    label: "Description (Courte)",
-    init: product => product.description.shortDescription,
-    checkError: true
-  },
-  longDescription: {
-    label: "Description (Longue)",
-    init: product => product.description.longDescription,
-    checkError: true
-  },
   isKit: {
     label: "Ensemble de produits (Kit)",
     init: product => product.metadata.isKit === "1",
@@ -56,10 +40,12 @@ export default {
     label: "Prix de détail",
     validators: [required],
     init: product => Number(product.price).toFixed(2),
+    export: v => parseFloat(v)
   },
   costPrice: {
     label: "Prix coûtant",
     init: product => Number(product.costPrice).toFixed(2),
+    export: v => parseFloat(v)
   },
   tags: {
     label: "Tags",
@@ -76,6 +62,27 @@ export default {
       id: productAttr.attribute.id,
       value: productAttr.isReference ? productAttr.valueId : productAttr.value,
       isEditable: productAttr.isEditable,
-    }))
+    })),
+    export: v => v.map(item => ({...item, value: item.value + ''}))
+  },
+  translations: {
+    label: "Traductions",
+    validators: [translations => {
+      return translations.reduce((acc, tr, key) => {
+        if (tr.name.trim() === "") {
+          acc[key] = "Obligatoire";
+        }
+
+        return acc;
+      }, []);
+    }],
+    init: product => product.translations.map(translation => ({
+      id: translation.id,
+      lang: translation.lang,
+      name: translation.description.name,
+      shortDescription: translation.description.shortDescription,
+      longDescription: translation.description.longDescription,
+      isDefault: translation.isDefault
+    })),
   }
 };

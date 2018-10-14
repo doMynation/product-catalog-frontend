@@ -1,9 +1,14 @@
 import initialState from './initialState';
 import {validate} from '../../util/validators';
 import form from './form.js';
+import ProductRepository from "../../util/ProductRepository";
+import {openNotification} from "../../shared/index";
 
 export const INIT = "productEdit/INIT";
 export const UPDATE = "productEdit/UPDATE";
+export const SAVE_PRODUCT_REQUEST = "productEdit/SAVE_PRODUCT_REQUEST";
+export const SAVE_PRODUCT_SUCCESS = "productEdit/SAVE_PRODUCT_SUCCESS";
+export const SAVE_PRODUCT_FAILURE = "productEdit/SAVE_PRODUCT_FAILURE";
 
 export const init = data => ({
   type: INIT,
@@ -16,14 +21,40 @@ export const updateField = (fieldName, value, error = "") => ({
   value
 });
 
+export const saveProduct = () => (dispatch, getState) => {
+  dispatch({type: SAVE_PRODUCT_REQUEST});
+
+  const currentState = getState().productEdit;
+
+  // Format data
+  const fields = Object.entries(currentState.fields).reduce((acc, [key, field]) => {
+    acc[key] = field.export ? field.export(field.value) : field.value;
+
+    return acc;
+  }, {});
+
+  ProductRepository
+    .updateProduct(currentState.product.id, fields)
+    .then(resp => {
+      dispatch(openNotification("Le produit a été mis à jour avec succès."))
+    })
+    .catch(err => {
+      dispatch({type: SAVE_PRODUCT_FAILURE, error: err});
+    });
+};
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SAVE_PRODUCT_REQUEST: {
+      return {
+        ...state,
+        isSaveButtonVisible: false
+      };
+    }
     case UPDATE:
       // Perform validation
       const field = state.fields[action.fieldName];
       const error = field.isDirty ? validate(action.value, field) : "";
-
       const newFields = {
         ...state.fields,
         [action.fieldName]: {
@@ -36,10 +67,13 @@ export default (state = initialState, action) => {
 
       return {
         ...state,
+        isSaveButtonVisible: Object.values(state.fields).every(field => field.error === "" || field.error.length === 0),
         fields: newFields,
       };
     case INIT:
       const {product, translations} = action.data;
+      product.translations = translations;
+
       const fields = Object.assign(...Object.entries(form).map(([key, field]) => {
         const value = field.init(product);
 
@@ -48,7 +82,7 @@ export default (state = initialState, action) => {
             ...field,
             value: value,
             oldValue: value,
-            isDirty: false,
+            isDirty: true,
             error: "",
           }
         };

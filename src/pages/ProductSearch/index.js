@@ -50,7 +50,7 @@ export const cloneProduct = productId => {
 
     ProductRepository.cloneProduct(productId)
       .then(resp => {
-        dispatch(openNotification(`Le produit [${resp.body.sku}] a été créé avec succès.`));
+        dispatch(openNotification(`Le produit [${resp.body.data.sku}] a été créé avec succès.`));
         dispatch(performSearch());
       })
       .catch(err => {
@@ -190,9 +190,9 @@ export const performSearch = () => {
     ProductRepository.searchProducts(filters, sortField, sortDescending, offset, state.pageSize)
     // .timeout(2000)
       .then(resp => {
-        const searchResult = resp.body;
+        const json = resp.body;
 
-        dispatch(receiveResults(searchResult.results, searchResult.totalCount));
+        dispatch(receiveResults(json.data, json.meta.count));
       })
       .catch(err => {
         if (err.timeout) {

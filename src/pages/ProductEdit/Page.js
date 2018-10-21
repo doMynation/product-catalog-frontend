@@ -14,11 +14,10 @@ import compose from "redux/src/compose";
 import HomeTab from "./HomeTab";
 import Section from "../../layout/Section";
 import {init, saveProduct, updateField} from "./index";
-import {receiveSharedData} from "../../shared/index";
+import {fetchSharedDataIfNeeded} from "../../shared/index";
 import Button from "@material-ui/core/es/Button/Button";
 import UpdateDiff from "./UpdateDiff";
 import AttributesTab from "./AttributesTab";
-import {normalizeList} from "../../util/functions";
 
 const styles = theme => ({
   root: {
@@ -28,12 +27,6 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2
   }
 });
-
-const availableLanguages = {
-  fr: "Français",
-  en: "English",
-  es: "Español",
-};
 
 class Page extends Component {
   constructor(props) {
@@ -47,25 +40,17 @@ class Page extends Component {
   }
 
   componentDidMount() {
-    Promise.all([
-      ProductRepository.getEditData(this.state.productId),
-      ProductRepository.getProductCategories(),
-      ProductRepository.getProductDepartments(),
-      ProductRepository.getStores(),
-      ProductRepository.getAttributes()
-    ]).then(data => {
-      const [{product, translations}, categories, departments, stores, attributes] = data;
+    ProductRepository
+      .getEditData(this.state.productId)
+      .then(json => {
+        this.props.fetchSharedDataIfNeeded(() => {
+          this.props.init(json.data);
 
-      this.props.init({product, translations});
-      this.props.receiveSharedData("categories", normalizeList(categories));
-      this.props.receiveSharedData("departments", normalizeList(departments));
-      this.props.receiveSharedData("attributes", normalizeList(attributes));
-      this.props.receiveSharedData("stores", normalizeList(stores));
-
-      this.setState({
-        isLoading: false,
+          this.setState({
+            isLoading: false,
+          });
+        });
       });
-    });
   }
 
   handleSubmit = (e) => {
@@ -108,9 +93,7 @@ class Page extends Component {
               <Paper className={classes.tabContent}>
                 {selectedTabIndex === "home" && <HomeTab/>}
                 {selectedTabIndex === "attributes" && <AttributesTab/>}
-                {selectedTabIndex === "translations" && <TranslationsTab
-                  languages={availableLanguages}
-                />}
+                {selectedTabIndex === "translations" && <TranslationsTab/>}
               </Paper>
             </Grid>
 
@@ -156,9 +139,9 @@ const mstp = ({shared, productEdit}) => ({
 
 const mdtp = dispatch => ({
   init: data => dispatch(init(data)),
-  receiveSharedData: (name, data) => dispatch(receiveSharedData(name, data)),
   updateField: (fieldName, value, error) => dispatch(updateField(fieldName, value, error)),
   saveProduct: () => dispatch(saveProduct()),
+  fetchSharedDataIfNeeded: onComplete => dispatch(fetchSharedDataIfNeeded(onComplete))
 });
 
 export default compose(

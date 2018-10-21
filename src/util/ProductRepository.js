@@ -1,21 +1,27 @@
 import {API_KEY, API_URL} from "../conf";
 import * as request from "superagent";
 
+// @todo: Handle 500 errors
+// @todo: Handle timeouts
+
 class ProductRepository {
-  static async updateProduct(productId, fields) {
+  static updateProduct(productId, hash, fields) {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 
     // Curate the data in the proper format
-    fields.metadata = {
-      mpn: fields.mpn,
-      isKit: fields.isKit ? "1" : "0",
+    const formattedFields = {
+      ...fields,
+      hash: hash,
+      metadata: {
+        mpn: fields.mpn,
+        isKit: fields.isKit ? "1" : "0",
+      }
     };
 
-    return await request
+    return request
       .put(url)
-      .send({
-        fields: fields
-      })
+      .send({fields: formattedFields})
+      .set('Accept', 'application/json')
       .set(this._prepHeaders());
   }
 
@@ -30,7 +36,6 @@ class ProductRepository {
         attributes: convertedAttributes
       })
       .set(this._prepHeaders());
-    // @todo: Handle 500 errors
   }
 
   static enableProducts(productIds) {
@@ -72,6 +77,7 @@ class ProductRepository {
 
     return request
       .post(url)
+      .set('Accept', 'application/json')
       .set(this._prepHeaders());
   }
 
@@ -106,37 +112,28 @@ class ProductRepository {
       .set(this._prepHeaders())
   }
 
-  static get(productId) {
-    const url = `${this.baseUrl}/products/${productId}`;
-
-    return fetch(url, {
-      method: "GET",
-      headers: this._prepHeaders()
-    }).then(resp => resp.json());
-  }
-
   static getEditData(productId) {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 
-    return fetch(url, {
-      method: "GET",
-      headers: this._prepHeaders()
-    }).then(resp => resp.json());
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body);
   }
 
   static getProductCategories() {
     const url = `${this.baseUrl}/productCategories/all`;
 
-    return fetch(url, {
-      method: "GET",
-      headers: this._prepHeaders()
-    }).then(resp => resp.json()).then(categories => {
-      return categories.map(categoryData => {
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body.map(categoryData => {
         const [category, depth] = categoryData;
 
         return Object.assign({}, category, {depth: depth});
-      })
-    });
+      }));
   }
 
   static getAttributes() {
@@ -152,10 +149,11 @@ class ProductRepository {
   static getProductDepartments() {
     const url = `${this.baseUrl}/productDepartments/all?lang=fr`;
 
-    return fetch(url, {
-      method: "GET",
-      headers: this._prepHeaders()
-    }).then(resp => resp.json());
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body);
   }
 
   static getStores() {

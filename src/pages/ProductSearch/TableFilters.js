@@ -47,7 +47,7 @@ class TableFilters extends React.PureComponent {
     name: this.props.name,
     storeId: this.props.storeId,
     categoryId: this.props.categoryId,
-    department: this.props.departmentId,
+    departmentId: this.props.departmentId,
     isKit: this.props.isKit,
     isCustom: this.props.isCustom,
     isEnabled: this.props.isEnabled,
@@ -146,25 +146,25 @@ class TableFilters extends React.PureComponent {
             <br/>
 
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="input-department">Département</InputLabel>
+              <InputLabel htmlFor="input-departmentId">Département</InputLabel>
               <Select
-                value={this.state.department}
+                value={this.state.departmentId}
                 onChange={this.handleFilterChange}
                 inputProps={{
-                  name: 'department',
-                  id: 'input-department'
+                  name: 'departmentId',
+                  id: 'input-departmentId'
                 }}>
                 <MenuItem value="">
                   <em>Tous</em>
                 </MenuItem>
                 {Object.entries(this.props.departments).map(([idx, department]) => (
-                  <MenuItem key={idx} value={department.code}>{department.description.name}</MenuItem>
+                  <MenuItem key={idx} value={department.id}>{department.description.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="input-department">Disponible dans...</InputLabel>
+              <InputLabel htmlFor="input-storeId">Disponible dans...</InputLabel>
               <Select
                 value={this.state.storeId}
                 onChange={this.handleFilterChange}

@@ -36,7 +36,6 @@ const TranslationsTab = ({translations, updateField}) => (
 );
 
 TranslationsTab.propTypes = {
-  languages: PropTypes.object.isRequired,
   translations: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 

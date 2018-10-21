@@ -34,17 +34,30 @@ export const saveProduct = () => (dispatch, getState) => {
   }, {});
 
   ProductRepository
-    .updateProduct(currentState.product.id, fields)
+    .updateProduct(currentState.product.id, currentState.product.hash, fields)
     .then(resp => {
+      const json = resp.body;
+
+      dispatch({type: SAVE_PRODUCT_SUCCESS, hash: json.data.hash});
       dispatch(openNotification("Le produit a été mis à jour avec succès."))
     })
     .catch(err => {
+      dispatch(openNotification("Une erreur s'est produite lors de la mise à jour du produit"))
       dispatch({type: SAVE_PRODUCT_FAILURE, error: err});
     });
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SAVE_PRODUCT_SUCCESS: {
+      return {
+        ...state,
+        product: {
+          ...state.product,
+          hash: action.hash
+        }
+      };
+    }
     case SAVE_PRODUCT_REQUEST: {
       return {
         ...state,

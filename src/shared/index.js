@@ -1,9 +1,9 @@
 import ProductRepository from "../util/ProductRepository";
 import {normalizeList} from "../util/functions";
 
-export const FETCH_SHARED_DATA = 'data/FETCH_SHARED_DATA';
+export const FETCH_SHARED_DATA_REQUEST = 'data/FETCH_SHARED_DATA_REQUEST';
+export const FETCH_SHARED_DATA_SUCCESS = 'data/FETCH_SHARED_DATA_SUCCESS';
 export const RECEIVE_SHARED_BASE_DATA = 'data/RECEIVE_SHARED_BASE_DATA';
-export const RECEIVE_SHARED_DATA = 'data/RECEIVE_SHARED_DATA';
 
 export const SHOW_UNAUTHORIZED = 'auth/SHOW_UNAUTHORIZED';
 export const LEFTMENU_OPEN = 'shared/LEFTMENU_OPEN';
@@ -13,12 +13,14 @@ export const NOTIFY_CLOSE = 'shared/NOTIFY_CLOSE';
 
 export const fetchSharedDataIfNeeded = onComplete => {
   return (dispatch, getState) => {
-    const sharedData = getState().shared.data;
+    const sharedState = getState().shared;
 
-    if (sharedData.isBaseDataLoaded) {
+    if (sharedState.isBaseDataLoaded) {
       onComplete();
       return;
     }
+
+    dispatch({type: FETCH_SHARED_DATA_REQUEST});
 
     Promise.all([
       ProductRepository.getProductCategories(),
@@ -32,20 +34,15 @@ export const fetchSharedDataIfNeeded = onComplete => {
       dispatch(receiveSharedData("departments", normalizeList(departments)));
       dispatch(receiveSharedData("attributes", normalizeList(attributes)));
       dispatch(receiveSharedData("stores", normalizeList(stores)));
-      dispatch(receiveSharedData("stores", normalizeList(stores)));
+      dispatch({type: RECEIVE_SHARED_BASE_DATA});
 
       onComplete();
     });
   };
 }
 
-export const receiveBaseData = (data) => ({
-  type: RECEIVE_SHARED_BASE_DATA,
-  data
-});
-
 export const receiveSharedData = (name, data) => ({
-  type: RECEIVE_SHARED_DATA,
+  type: FETCH_SHARED_DATA_SUCCESS,
   name,
   data
 });
@@ -99,9 +96,8 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isBaseDataLoaded: true,
-        data: action.data
       };
-    case RECEIVE_SHARED_DATA:
+    case FETCH_SHARED_DATA_SUCCESS:
       return {
         ...state,
         data: {

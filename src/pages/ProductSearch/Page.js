@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import 'whatwg-fetch'
 import ProductSearchGrid from "./SearchGrid";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import withStyles from "@material-ui/core/es/styles/withStyles";

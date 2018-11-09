@@ -18,6 +18,7 @@ import {fetchSharedDataIfNeeded} from "../../shared/index";
 import Button from "@material-ui/core/es/Button/Button";
 import UpdateDiff from "./UpdateDiff";
 import AttributesTab from "./AttributesTab";
+import CompositionTab from "./CompositionTab";
 
 const styles = theme => ({
   root: {
@@ -94,6 +95,7 @@ class Page extends Component {
                 {selectedTabIndex === "home" && <HomeTab/>}
                 {selectedTabIndex === "attributes" && <AttributesTab/>}
                 {selectedTabIndex === "translations" && <TranslationsTab/>}
+                {selectedTabIndex === "composition" && <CompositionTab children={product.children}/>}
               </Paper>
             </Grid>
 

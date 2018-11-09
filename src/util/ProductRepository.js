@@ -81,6 +81,10 @@ class ProductRepository {
       .set(this._prepHeaders());
   }
 
+  static quickSearch(needle) {
+    return this.searchProducts({nameSku: needle});
+  }
+
   static searchProducts(filters, sortField, sortDescending, offset, limit) {
     sortField = sortField || null;
     sortDescending = sortDescending || false;

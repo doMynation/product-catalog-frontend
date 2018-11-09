@@ -84,5 +84,20 @@ export default {
       longDescription: translation.description.longDescription,
       isDefault: translation.isDefault
     })),
+  },
+  children: {
+    label: "Children",
+    validators: [children => {
+      // @todo
+      return "";
+    }],
+    init: product => product.children,
+    export: v => v.map(child => ({
+      productId: child.product.id,
+      childType: child.childType,
+      quantity: child.quantity,
+      isVisible: child.isVisible,
+      isCompiled: child.isCompiled,
+    }))
   }
 };

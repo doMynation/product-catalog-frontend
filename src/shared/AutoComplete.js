@@ -6,6 +6,7 @@ import MenuItem from "@material-ui/core/es/MenuItem/MenuItem";
 import Paper from "@material-ui/core/es/Paper/Paper";
 import Select from "react-select";
 import withStyles from "@material-ui/core/es/styles/withStyles";
+import AsyncSelect from 'react-select/lib/Async';
 
 const styles = theme => ({
   root: {
@@ -149,7 +150,7 @@ class AutoComplete extends React.Component {
   }
 
   render() {
-    const {classes, theme, options, placeholder = "", clearOnSelect = false} = this.props;
+    const {classes, theme, options, placeholder = "", clearOnSelect = false, isAsync = false, asyncFetch = null, formatOption = null} = this.props;
     const selectStyles = {
       input: base => ({
         ...base,
@@ -157,28 +158,49 @@ class AutoComplete extends React.Component {
       }),
     };
 
+    const conditionalProps = {};
+    if (formatOption !== null) conditionalProps.formatOptionLabel = formatOption;
+
     return (
       <div className={classes.root}>
-        <Select
-          classes={classes}
-          styles={selectStyles}
-          options={options}
-          components={components}
-          onChange={this.onChange}
-          placeholder={placeholder}
-          value={clearOnSelect ? "" : this.state.value}
-          autoFocus
-        />
+        {isAsync ?
+          <AsyncSelect
+            classes={classes}
+            styles={selectStyles}
+            components={components}
+            onChange={this.onChange}
+            placeholder={placeholder}
+            value={clearOnSelect ? "" : this.state.value}
+            autoFocus
+            cacheOptions
+            loadOptions={asyncFetch}
+            {...conditionalProps}
+          /> :
+          <Select
+            classes={classes}
+            styles={selectStyles}
+            options={options}
+            components={components}
+            onChange={this.onChange}
+            placeholder={placeholder}
+            value={clearOnSelect ? "" : this.state.value}
+            autoFocus
+            {...conditionalProps}
+          />
+        }
       </div>
     );
   }
 }
 
 AutoComplete.propTypes = {
-  options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
+  options: PropTypes.array,
   placeholder: PropTypes.string,
-  clearOnSelect: PropTypes.bool
+  clearOnSelect: PropTypes.bool,
+  isAsync: PropTypes.bool,
+  asyncFetch: PropTypes.func,
+  formatOption: PropTypes.func,
 };
 
 export default withStyles(styles, {withTheme: true})(AutoComplete);

@@ -78,7 +78,6 @@ export const bulkAddAttributes = attributes => {
       .then(resp => {
         dispatch({type: BULK_UPDATE_SUCCESS, productIds: selectedProductIds});
         dispatch(openNotification(`Les attributs ont été ajoutés aux produits sélectionnés.`));
-        // dispatch(performSearch());
       })
       .catch(err => dispatch({type: BULK_ACTION_ERROR}));
   }

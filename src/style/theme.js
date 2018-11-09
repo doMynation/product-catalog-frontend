@@ -11,6 +11,7 @@ const theme = createMuiTheme({
     success: green[500],
     error: red[500],
     dark: grey[800],
+    disabled: grey[700],
 
     layout: {
       sectionHeader: '#3C4252',

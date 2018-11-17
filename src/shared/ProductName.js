@@ -7,18 +7,23 @@ import Typography from "@material-ui/core/es/Typography/Typography";
 const styles = theme => ({
   sku: {
     marginLeft: theme.spacing.unit / 2,
-    display: 'inline'
-  }
+    display: 'inline',
+    fontSize: 'inherit',
+    color: 'inherit',
+  },
+  name: {
+    color: 'inherit',
+  },
 });
 
 const ProductName = ({classes, sku, name}) => (
   <div>
     <div>
-      <i className="fas fa-barcode fa-xs"></i>
+      <i className="fas fa-barcode"></i>
       <Typography variant="caption" className={classes.sku}><strong>{sku}</strong></Typography>
     </div>
 
-    <Typography variant="caption">{name}</Typography>
+    <Typography variant="caption" className={classes.name}>{name}</Typography>
   </div>
 );
 

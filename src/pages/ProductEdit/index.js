@@ -10,9 +10,20 @@ export const SAVE_PRODUCT_REQUEST = "productEdit/SAVE_PRODUCT_REQUEST";
 export const SAVE_PRODUCT_SUCCESS = "productEdit/SAVE_PRODUCT_SUCCESS";
 export const SAVE_PRODUCT_FAILURE = "productEdit/SAVE_PRODUCT_FAILURE";
 
+export const SAVE_DIALOG_OPEN = "productEdit/SAVE_DIALOG_OPEN";
+export const SAVE_DIALOG_CLOSE = "productEdit/SAVE_DIALOG_CLOSE";
+
 export const init = data => ({
   type: INIT,
   data
+});
+
+export const openSaveDialog = () => ({
+  type: SAVE_DIALOG_OPEN
+});
+
+export const closeSaveDialog = () => ({
+  type: SAVE_DIALOG_CLOSE
 });
 
 export const updateField = (fieldName, value, error = "") => ({
@@ -40,6 +51,13 @@ export const saveProduct = () => (dispatch, getState) => {
 
       dispatch({type: SAVE_PRODUCT_SUCCESS, hash: json.data.hash});
       dispatch(openNotification("Le produit a été mis à jour avec succès."))
+
+      // Reload the product and re-initialise the state
+      ProductRepository
+        .getEditData(currentState.product.id)
+        .then(resp => {
+          dispatch(init(resp.data));
+        });
     })
     .catch(err => {
       dispatch(openNotification("Une erreur s'est produite lors de la mise à jour du produit"))
@@ -49,6 +67,18 @@ export const saveProduct = () => (dispatch, getState) => {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SAVE_DIALOG_OPEN: {
+      return {
+        ...state,
+        isSaveDialogOpen: true
+      };
+    }
+    case SAVE_DIALOG_CLOSE: {
+      return {
+        ...state,
+        isSaveDialogOpen: false
+      };
+    }
     case SAVE_PRODUCT_SUCCESS: {
       return {
         ...state,
@@ -102,7 +132,7 @@ export default (state = initialState, action) => {
       }));
 
       return {
-        ...state,
+        ...initialState,
         product: product,
         fields: fields
       };

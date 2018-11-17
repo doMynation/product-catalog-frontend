@@ -173,6 +173,7 @@ class HomeTab extends Component {
                     id: 'departmentId',
                     name: 'departmentId',
                   }}>
+                  <MenuItem value={""}>Aucun</MenuItem>
                   {Object.entries(departments).map(([idx, department]) => (
                     <MenuItem key={idx} value={department.id}>{department.description.name}</MenuItem>
                   ))}

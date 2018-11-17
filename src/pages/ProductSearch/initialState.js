@@ -18,8 +18,8 @@ export default {
       isCustom: "",
       isEnabled: "1",
     },
-    sortField: "",
-    sortOrder: "asc"
+    sortField: "id",
+    sortOrder: "desc"
   },
   products: [],
   selected: [],

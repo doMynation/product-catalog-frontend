@@ -79,7 +79,7 @@ class ProductSearchPage extends Component {
 
         <Grid container>
           <Grid item>
-            <PageHeader text="Trouver un produit"/>
+            <PageHeader>Trouver un produit</PageHeader>
           </Grid>
 
           <Grid item xs={12}>

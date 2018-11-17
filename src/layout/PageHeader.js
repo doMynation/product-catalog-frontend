@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/es/Typography/Typography";
 import withStyles from "@material-ui/core/es/styles/withStyles";
-import Icon from "@material-ui/core/es/Icon/Icon";
 
 const styles = theme => ({
   root: {
@@ -25,16 +24,13 @@ const styles = theme => ({
 const PageHeader = ({children, classes, text, icon = null}) => (
   <div className={classes.root}>
     <Typography variant="display1" className={classes.text}>
-      {icon !== null && <Icon className={icon}>{icon}</Icon>}
-
-      {text}
+      {children}
     </Typography>
   </div>
 );
 
 PageHeader.propTypes = {
-  text: PropTypes.string.isRequired,
-  icon: PropTypes.string
+  children: PropTypes.any.isRequired
 };
 
 export default withStyles(styles)(PageHeader);

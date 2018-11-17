@@ -17,7 +17,7 @@ class Page extends Component {
 
     return (
       <div className={classes.root}>
-        <PageHeader text="Créer un nouveau produit"/>
+        <PageHeader>Créer un nouveau produit</PageHeader>
 
         <Grid container className={classes.layout} spacing={16}>
           <Grid item xs={12} md={2} lg={2}>

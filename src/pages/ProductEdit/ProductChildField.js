@@ -10,6 +10,7 @@ import FormControl from "@material-ui/core/es/FormControl/FormControl";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import ProductName from "../../shared/ProductName";
+import Typography from "@material-ui/core/es/Typography/Typography";
 
 const styles = theme => ({
   buttonOn: {
@@ -65,7 +66,9 @@ class ProductChildField extends Component {
               <Icon>delete</Icon>
             </IconButton>
 
-            <ProductName sku={child.product.sku} name={child.product.description.name}/>
+            <Typography variant="caption">
+              <ProductName sku={child.product.sku} name={child.product.description.name}/>
+            </Typography>
           </Grid>
         </Grid>
 

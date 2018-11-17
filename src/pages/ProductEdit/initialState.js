@@ -1,8 +1,6 @@
 export default {
   isSaveButtonVisible: false,
+  isSaveDialogOpen: false,
   product: undefined,
-  newProduct: undefined,
-  selectedTab: "",
   fields: {},
-  diff: {}
 };

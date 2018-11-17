@@ -13,12 +13,13 @@ import connect from "react-redux/es/connect/connect";
 import compose from "redux/src/compose";
 import HomeTab from "./HomeTab";
 import Section from "../../layout/Section";
-import {init, saveProduct, updateField} from "./index";
+import {init, openSaveDialog, updateField} from "./index";
 import {fetchSharedDataIfNeeded} from "../../shared/index";
 import Button from "@material-ui/core/es/Button/Button";
-import UpdateDiff from "./UpdateDiff";
 import AttributesTab from "./AttributesTab";
 import CompositionTab from "./CompositionTab";
+import ProductName from "../../shared/ProductName";
+import SaveDialog from "./SaveDialog";
 
 const styles = theme => ({
   root: {
@@ -37,6 +38,7 @@ class Page extends Component {
       selectedTabIndex: "home",
       productId: props.match.params['productId'],
       isLoading: true,
+      isDiffDialogOpen: false,
     }
   }
 
@@ -57,7 +59,7 @@ class Page extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    this.props.saveProduct();
+    this.props.openSaveDialog();
   }
 
   render() {
@@ -66,6 +68,8 @@ class Page extends Component {
     return (
       <div className={classes.root}>
         {this.state.isLoading ? <Loading/> : this.renderForm()}
+
+        <SaveDialog/>
       </div>
     );
   }
@@ -79,7 +83,9 @@ class Page extends Component {
         <form onSubmit={this.handleSubmit}>
           <Grid container spacing={16}>
             <Grid item container xs={12} justify="space-between">
-              <PageHeader text={`[${product.id}] ${product.description.name}`}/>
+              <PageHeader>
+                <ProductName sku={product.sku} name={product.description.name}/>
+              </PageHeader>
 
               {isSaveButtonVisible &&
               <Button variant="contained" size="small" type="submit">
@@ -97,12 +103,6 @@ class Page extends Component {
                 {selectedTabIndex === "translations" && <TranslationsTab/>}
                 {selectedTabIndex === "composition" && <CompositionTab children={product.children}/>}
               </Paper>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Section>
-                <UpdateDiff/>
-              </Section>
             </Grid>
           </Grid>
         </form>
@@ -142,7 +142,7 @@ const mstp = ({shared, productEdit}) => ({
 const mdtp = dispatch => ({
   init: data => dispatch(init(data)),
   updateField: (fieldName, value, error) => dispatch(updateField(fieldName, value, error)),
-  saveProduct: () => dispatch(saveProduct()),
+  openSaveDialog: () => dispatch(openSaveDialog()),
   fetchSharedDataIfNeeded: onComplete => dispatch(fetchSharedDataIfNeeded(onComplete))
 });
 

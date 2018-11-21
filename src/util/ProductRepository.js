@@ -116,6 +116,16 @@ class ProductRepository {
       .set(this._prepHeaders())
   }
 
+  static get(productId) {
+    const url = `${this.baseUrl}/products/${productId}`;
+
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body);
+  }
+
   static getEditData(productId) {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 

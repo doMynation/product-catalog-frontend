@@ -15,6 +15,7 @@ class ProductRepository {
       metadata: {
         mpn: fields.mpn,
         isKit: fields.isKit ? "1" : "0",
+        imageUrl: fields.imageUrl
       }
     };
 

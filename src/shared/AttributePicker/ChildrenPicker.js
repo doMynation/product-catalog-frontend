@@ -111,7 +111,7 @@ class ChildrenPicker extends Component {
         const children = template.children.reduce((acc, child) => {
           const matchingProduct = products.find(product => product.id === child.productId)
 
-          if (matchingProduct == undefined) {
+          if (matchingProduct === undefined) {
             return acc;
           }
 

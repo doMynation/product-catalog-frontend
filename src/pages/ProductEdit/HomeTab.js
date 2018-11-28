@@ -19,6 +19,7 @@ import Switch from "@material-ui/core/es/Switch/Switch";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Icon from "@material-ui/core/es/Icon/Icon";
+import Uploader from "../../shared/Uploader";
 
 const styles = theme => ({
   switches: {
@@ -41,6 +42,7 @@ const styles = theme => ({
 });
 
 const tagSuggestion = ["model", "kmo"].map(name => ({name: name}));
+const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/tiff'];
 
 class HomeTab extends Component {
   handleAddTag = ({name}) => {
@@ -200,7 +202,14 @@ class HomeTab extends Component {
         </Grid>
 
         <Grid item xs={12} sm={6} className={classes.imageContainer}>
-          <img src="https://picsum.photos/200/300/?random" alt="Aucune" className={classes.image}/>
+          <Uploader
+            acceptedFileTypes={acceptedFileTypes}
+            files={fields.imageUrl.value !== "" ? [fields.imageUrl.value] : []}
+            onFilesChanged={files => {
+              const fileUrl = files[0] === undefined ? "" : files[0];
+              updateField("imageUrl", fileUrl)
+            }}
+          />
         </Grid>
 
         <Grid item xs={6}>

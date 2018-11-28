@@ -99,5 +99,9 @@ export default {
       isVisible: child.isVisible,
       isCompiled: child.isCompiled,
     }))
+  },
+  imageUrl: {
+    label: "Image",
+    init: product => product.metadata.imageUrl,
   }
 };

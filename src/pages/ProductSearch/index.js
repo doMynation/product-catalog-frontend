@@ -191,7 +191,7 @@ export const performSearch = () => {
       .then(resp => {
         const json = resp.body;
 
-        dispatch(receiveResults(json.data, parseInt(json.meta.count)));
+        dispatch(receiveResults(json.data, parseInt(json.meta.count, 10)));
       })
       .catch(err => {
         if (err.timeout) {

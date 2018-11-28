@@ -7,27 +7,56 @@ import DialogContent from "@material-ui/core/es/DialogContent/DialogContent";
 import DialogContentText from "@material-ui/core/es/DialogContentText/DialogContentText";
 import DialogActions from "@material-ui/core/es/DialogActions/DialogActions";
 import Button from "@material-ui/core/es/Button/Button";
+import CircularProgress from "@material-ui/core/es/CircularProgress/CircularProgress";
 
-const styles = theme => ({});
+const styles = theme => ({
+  loading: {...theme.buttonProgress}
+});
 
-const Window = ({isOpen, onClose, onSubmit, title, description, children}) => (
-  <Dialog
-    open={isOpen}
-    onClose={onClose}
-    aria-labelledby="Confirmer les changements"
-  >
-    <DialogTitle id="form-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText style={{marginBottom: 16}}>{description}</DialogContentText>
-      {children}
-    </DialogContent>
+class Window extends React.Component {
+  state = {
+    isLoading: false
+  };
 
-    <DialogActions>
-      <Button onClick={onClose} color="primary">Annuler</Button>
-      <Button onClick={onSubmit} color="primary">Soumettre</Button>
-    </DialogActions>
-  </Dialog>
-);
+  static getDerivedStateFromProps(nextProps, prevState) {
+    return {
+      isLoading: nextProps.isOpen && prevState.isLoading
+    }
+  }
+
+  handleSubmit = () => {
+    this.setState({isLoading: true});
+
+    this.props.onSubmit();
+  }
+
+  render() {
+    const {classes, isOpen, onClose, title, description, children} = this.props;
+
+    return (
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
+        aria-labelledby="Confirmer les changements"
+      >
+        <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText style={{marginBottom: 16}}>{description}</DialogContentText>
+          {children}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={onClose} color="primary">Annuler</Button>
+          <Button onClick={this.handleSubmit} color="primary" disabled={this.state.isLoading}>
+            Soumettre
+
+            {this.state.isLoading && <CircularProgress className={classes.loading} size={20}/>}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
 
 Window.propTypes = {
   isOpen: PropTypes.bool.isRequired,

@@ -26,14 +26,16 @@ export const fetchSharedDataIfNeeded = onComplete => {
       ProductRepository.getProductCategories(),
       ProductRepository.getProductDepartments(),
       ProductRepository.getStores(),
-      ProductRepository.getAttributes()
+      ProductRepository.getAttributes(),
+      ProductRepository.getExtrusions(),
     ]).then(data => {
-      const [categories, departments, stores, attributes] = data;
+      const [categories, departments, stores, attributes, extrusions] = data;
 
       dispatch(receiveSharedData("categories", normalizeList(categories)));
       dispatch(receiveSharedData("departments", normalizeList(departments)));
       dispatch(receiveSharedData("attributes", normalizeList(attributes)));
       dispatch(receiveSharedData("stores", normalizeList(stores)));
+      dispatch(receiveSharedData("extrusions", normalizeList(extrusions)));
       dispatch({type: RECEIVE_SHARED_BASE_DATA});
 
       onComplete();

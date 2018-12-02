@@ -103,5 +103,13 @@ export default {
   imageUrl: {
     label: "Image",
     init: product => product.metadata.imageUrl,
-  }
+  },
+  extrusionId: {
+    label: "Extrusion",
+    init: product => product.metadata.extrusionId ? product.metadata.extrusionId : "",
+  },
+  stickerId: {
+    label: "Étiquette",
+    init: product => product.metadata.stickerId && product.metadata.stickerId !== "0" ? product.metadata.stickerId : "",
+  },
 };

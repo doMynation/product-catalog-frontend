@@ -38,6 +38,18 @@ const styles = theme => ({
   image: {},
   imageContainer: {
     textAlign: 'center'
+  },
+  extrusionThumbnail: {
+    maxWidth: 50,
+    height: 30,
+    marginRight: theme.spacing.unit,
+    border: '1px dashed #CCC',
+  },
+  selectedExtrusion: {
+    maxWidth: 50,
+    height: 10,
+    marginRight: theme.spacing.unit,
+    border: '1px dashed #CCC',
   }
 });
 
@@ -90,7 +102,7 @@ class HomeTab extends Component {
   }
 
   render() {
-    const {fields, classes, updateField, categories, departments} = this.props;
+    const {fields, classes, updateField, categories, departments, extrusions} = this.props;
     const tags = fields.tags.value.map(tag => ({name: tag}));
     const defaultTranslationIdx = fields.translations.value.findIndex(tr => tr.isDefault);
 
@@ -128,7 +140,8 @@ class HomeTab extends Component {
                   onChange={this.handleChange}
                   value={fields.sku.value}
                 />
-                {fields.sku.error && <FormHelperText error>{fields.sku.error}</FormHelperText>}
+                {fields.sku.error &&
+                <FormHelperText error>{fields.sku.error}</FormHelperText>}
               </FormControl>
             </Grid>
 
@@ -142,7 +155,8 @@ class HomeTab extends Component {
                   onChange={this.handleChange}
                   value={fields.mpn.value}
                 />
-                {fields.mpn.error && <FormHelperText error>{fields.mpn.error}</FormHelperText>}
+                {fields.mpn.error &&
+                <FormHelperText error>{fields.mpn.error}</FormHelperText>}
               </FormControl>
             </Grid>
 
@@ -185,18 +199,70 @@ class HomeTab extends Component {
 
             <Grid item xs={12}>
               <Typography variant="caption" paragraph>
-                La <strong>catégorie</strong> correspond au
-                <strong>type du produit</strong>. Par exemple, une vis fait partie de la catégorie Quincaillerie.
+                La <strong>catégorie</strong> correspond au <strong>type du produit</strong>.
+                Par exemple, une vis fait partie de la catégorie Quincaillerie.
               </Typography>
               <Typography variant="caption" paragraph>
-                Le <strong>départment</strong> correspond au département qui
-                <strong>gère le produit au niveau de la production</strong>. Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
+                Le <strong>départment</strong> correspond au département qui <strong>gère le produit au niveau de la production</strong>.
+                Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
               </Typography>
               <Typography variant="caption" paragraph>
-                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun. Prenons l'exemple du DVD d'installation, dont la
-                <strong>catégorie est Documentation</strong> et le
-                <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
+                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun.
+                Prenons l'exemple du DVD d'installation, dont la <strong>catégorie est Documentation</strong> et le <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
               </Typography>
+            </Grid>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="input-extrusion">Extrusion</InputLabel>
+                <Select
+                  value={fields.extrusionId.value}
+                  renderValue={extrusionId => {
+                    const extrusion = extrusions[extrusionId];
+                    return (
+                      <div>
+                        <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.selectedExtrusion}/>
+                        {extrusion.templateName}
+                      </div>
+                    );
+                  }}
+                  onChange={event => {
+                    const {name, value} = event.target;
+                    updateField(name, value);
+                  }}
+                  inputProps={{
+                    id: 'extrusionId',
+                    name: 'extrusionId',
+                  }}>
+                  <MenuItem value={""}>Aucune</MenuItem>
+                  {Object.entries(extrusions).map(([idx, extrusion]) => (
+                    <MenuItem key={idx} value={extrusion.id}>
+                      <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.extrusionThumbnail}/>
+                      {extrusion.templateName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel htmlFor="input-stickerId">Étiquette</InputLabel>
+                <Select
+                  value={fields.stickerId.value}
+                  onChange={event => {
+                    const {name, value} = event.target;
+                    updateField(name, value);
+                  }}
+                  inputProps={{
+                    id: 'stickerId',
+                    name: 'stickerId',
+                  }}>
+                  <MenuItem value={""}>Aucune</MenuItem>
+                  <MenuItem value="1">Petit (4x1)</MenuItem>
+                  <MenuItem value="2">Gros (4x3)</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
         </Grid>
@@ -241,11 +307,13 @@ class HomeTab extends Component {
                   onChange={this.handleChange}
                   onFocus={e => e.target.select()}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment:
+                      <InputAdornment position="start">$</InputAdornment>,
                   }}
                   error={fields.price.error !== ""}
                 />
-                {fields.price.error && <FormHelperText error>{fields.price.error}</FormHelperText>}
+                {fields.price.error &&
+                <FormHelperText error>{fields.price.error}</FormHelperText>}
               </FormControl>
             </Grid>
 
@@ -260,11 +328,13 @@ class HomeTab extends Component {
                   onChange={this.handleChange}
                   onFocus={e => e.target.select()}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment:
+                      <InputAdornment position="start">$</InputAdornment>,
                   }}
                   error={fields.costPrice.error !== ""}
                 />
-                {fields.costPrice.error && <FormHelperText error>{fields.costPrice.error}</FormHelperText>}
+                {fields.costPrice.error &&
+                <FormHelperText error>{fields.costPrice.error}</FormHelperText>}
               </FormControl>
             </Grid>
           </Grid>
@@ -346,6 +416,7 @@ const mstp = state => ({
   fields: state.productEdit.fields,
   categories: state.shared.data.categories,
   departments: state.shared.data.departments,
+  extrusions: state.shared.data.extrusions,
 });
 
 const mdtp = dispatch => ({

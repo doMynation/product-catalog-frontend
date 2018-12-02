@@ -9,13 +9,16 @@ class ProductRepository {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 
     // Curate the data in the proper format
+    // @todo: Fix this permanently (via form.js @ export? fnc)
     const formattedFields = {
       ...fields,
       hash: hash,
       metadata: {
         mpn: fields.mpn,
         isKit: fields.isKit ? "1" : "0",
-        imageUrl: fields.imageUrl
+        imageUrl: fields.imageUrl,
+        stickerId: "" + fields.stickerId,
+        extrusionId: "" + fields.extrusionId,
       }
     };
 
@@ -153,6 +156,16 @@ class ProductRepository {
 
   static getAttributes() {
     const url = `${this.baseUrl}/attributes/all?lang=fr`;
+
+    return request
+      .get(url)
+      .set('Accept', 'application/json')
+      .set(this._prepHeaders())
+      .then(resp => resp.body);
+  }
+
+  static getExtrusions() {
+    const url = `${this.baseUrl}/extrusions/all`;
 
     return request
       .get(url)

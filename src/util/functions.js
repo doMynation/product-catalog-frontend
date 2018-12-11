@@ -1,3 +1,5 @@
+import ProductRepository from "./ProductRepository";
+
 export function filterObj(obj, predicate) {
   let newObject = {};
 
@@ -21,3 +23,11 @@ export function normalizeList(data, key = "id") {
     return acc;
   }, {});
 }
+
+export function suggestProduct(needle) {
+  return ProductRepository
+    .quickSearch(needle)
+    .then(resp =>
+      resp.body.data.map(product => ({value: product, label: product.description.name}))
+    );
+};

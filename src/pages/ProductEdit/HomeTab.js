@@ -178,7 +178,7 @@ class HomeTab extends Component {
 
             <Grid item xs={6}>
               <FormControl className={classes.formControl} fullWidth>
-                <InputLabel htmlFor="input-department">Département</InputLabel>
+                <InputLabel htmlFor="departmentId">Département</InputLabel>
                 <Select
                   value={fields.departmentId.value}
                   onChange={event => {
@@ -214,7 +214,7 @@ class HomeTab extends Component {
 
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="input-extrusion">Extrusion</InputLabel>
+                <InputLabel htmlFor="extrusionId">Extrusion</InputLabel>
                 <Select
                   value={fields.extrusionId.value}
                   renderValue={extrusionId => {
@@ -247,7 +247,7 @@ class HomeTab extends Component {
 
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor="input-stickerId">Étiquette</InputLabel>
+                <InputLabel htmlFor="stickerId">Étiquette</InputLabel>
                 <Select
                   value={fields.stickerId.value}
                   onChange={event => {

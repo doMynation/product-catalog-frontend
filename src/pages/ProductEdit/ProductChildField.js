@@ -124,6 +124,7 @@ class ProductChildField extends Component {
 ProductChildField.propTypes = {
   child: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(ProductChildField);

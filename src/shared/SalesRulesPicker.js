@@ -1,19 +1,23 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
-import AutoComplete from "../AutoComplete";
-import ProductChildField from "../../pages/ProductEdit/ProductChildField";
-import ProductRepository from "../../util/ProductRepository";
+import AutoComplete from "./AutoComplete";
+import ProductRepository from "../util/ProductRepository";
 import Collapse from "@material-ui/core/es/Collapse/Collapse";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Icon from "@material-ui/core/es/Icon/Icon";
-import SavedTemplates from "./SavedTemplates";
 import moment from "moment";
-import Loading from "../Loading";
+import Loading from "./Loading";
+import {suggestProduct} from "../util/functions";
+import SavedTemplates from "./SavedTemplates/SavedTemplates";
+import SalesRule from "../pages/ProductEdit/SalesRule";
 
-const LOCAL_STORAGE_KEY = "CHILDREN_PICKER_TEMPLATES";
+const LOCAL_STORAGE_KEY = "SavedTemplates::SALES_RULES";
+const i18n = {
+  autocompletePlaceholder: "Tapez le nom ou SKU d'un produit (ex: ATT90) ...",
+};
 
 const styles = theme => ({
   childrenContainer: {
@@ -21,25 +25,15 @@ const styles = theme => ({
   }
 });
 
-// @todo: Move this elsewhere
-const search = needle => {
-  return ProductRepository
-    .quickSearch(needle)
-    .then(resp =>
-      resp.body.data.map(product => ({value: product, label: product.description.name}))
-    );
-};
-
-const createChild = product => ({
+const createRule = product => ({
   id: `NEW_${Math.random() * 20}`,
-  isVisible: false,
-  isCompiled: false,
   product: product,
-  childType: "composed",
+  ruleType: "normal",
+  newPrice: product.price,
   quantity: 1,
 });
 
-class ChildrenPicker extends Component {
+class SalesRulesPicker extends Component {
   state = {
     isSavedTemplateMode: false,
     isLoading: false,
@@ -74,12 +68,11 @@ class ChildrenPicker extends Component {
     const newTemplate = {
       name: templateName,
       date: moment().format("YYYY-MM-DD H:mm"),
-      children: this.props.children.map(child => ({
-        productId: child.product.id,
-        childType: child.childType,
-        isVisible: child.isVisible,
-        isCompiled: child.isCompiled,
-        quantity: child.quantity
+      salesRules: this.props.salesRules.map(rule => ({
+        productId: rule.product.id,
+        ruleType: rule.ruleType,
+        newPrice: rule.price,
+        quantity: rule.quantity,
       }))
     };
 
@@ -96,7 +89,7 @@ class ChildrenPicker extends Component {
     }
 
     // Fetch products
-    const productIds = template.children.map(child => child.productId).join(",")
+    const productIds = template.salesRules.map(rule => rule.productId).join(",")
 
     this.setState({
       isLoading: true,
@@ -108,26 +101,25 @@ class ChildrenPicker extends Component {
       .then(apiProducts => {
         const products = Array.isArray(apiProducts) ? apiProducts : [apiProducts];
 
-        const children = template.children.reduce((acc, child) => {
-          const matchingProduct = products.find(product => product.id === child.productId)
+        const rules = template.salesRules.reduce((acc, rule) => {
+          const matchingProduct = products.find(product => product.id === rule.productId)
 
           if (matchingProduct === undefined) {
             return acc;
           }
 
-          const newChild = createChild(matchingProduct);
-          newChild.childType = child.childType;
-          newChild.isVisible = child.isVisible;
-          newChild.isCompiled = child.isCompiled;
-          newChild.quantity = child.quantity;
+          const newRule = createRule(matchingProduct);
+          newRule.ruleType = rule.ruleType;
+          newRule.newPrice = rule.newPrice;
+          newRule.quantity = rule.quantity;
 
-          return acc.concat(newChild);
+          return acc.concat(newRule);
         }, []);
 
-        const newChildren = this.props.children.concat(children);
+        const newRules = this.props.salesRules.concat(rules);
 
         this.setState({isLoading: false});
-        this.props.onChange(newChildren)
+        this.props.onChange(newRules)
       });
   }
 
@@ -139,33 +131,33 @@ class ChildrenPicker extends Component {
 
   handleAdd = product => {
     // Prevent duplicates
-    const exists = this.props.children.some(child => child.product.id === product.id)
+    const exists = this.props.salesRules.some(rule => rule.product.id === rule.id)
 
     if (exists) {
       return;
     }
 
-    const newChildren = this.props.children.concat(createChild(product));
+    const newRules = this.props.salesRules.concat(createRule(product));
 
-    this.props.onChange(newChildren);
+    this.props.onChange(newRules);
   }
 
   handleDelete = idx => {
-    const newChildren = [...this.props.children];
-    newChildren.splice(idx, 1);
+    const newRules = [...this.props.salesRules];
+    newRules.splice(idx, 1);
 
-    this.props.onChange(newChildren);
+    this.props.onChange(newRules);
   }
 
-  handleChange = (key, newChild) => {
-    const newChildren = [...this.props.children];
-    newChildren[key] = newChild;
+  handleChange = (key, newRule) => {
+    const newRules = [...this.props.salesRules];
+    newRules[key] = newRule;
 
-    this.props.onChange(newChildren);
+    this.props.onChange(newRules);
   }
 
   render() {
-    const {classes, children, isLoading} = this.props;
+    const {classes, salesRules, isLoading} = this.props;
     const {isSavedTemplateMode, savedTemplates} = this.state;
 
     return (
@@ -176,9 +168,9 @@ class ChildrenPicker extends Component {
               <AutoComplete
                 onChange={selected => this.handleAdd(selected.value)}
                 formatOption={({value}) => `[${value.sku}] ${value.description.name}`}
-                placeholder="Tapez le nom ou SKU d'une pièce (ex: ATT90) ..."
+                placeholder={i18n.autocompletePlaceholder}
                 isAsync
-                asyncFetch={search}
+                asyncFetch={suggestProduct}
                 clearOnSelect
               />
             </Grid>
@@ -196,10 +188,11 @@ class ChildrenPicker extends Component {
             <div><Loading/></div>
             :
             <div className={classes.childrenContainer}>
-              {children.map((child, key) =>
-                <ProductChildField
-                  key={`child_${key}`} child={child}
-                  onChange={newChild => this.handleChange(key, newChild)}
+              {salesRules.map((rule, key) =>
+                <SalesRule
+                  key={`rule_${key}`}
+                  rule={rule}
+                  onChange={newRule => this.handleChange(key, newRule)}
                   onDelete={() => this.handleDelete(key)}
                 />
               )}
@@ -221,9 +214,10 @@ class ChildrenPicker extends Component {
   }
 }
 
-ChildrenPicker.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.object),
+SalesRulesPicker.propTypes = {
+  salesRules: PropTypes.arrayOf(PropTypes.object),
   onChange: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(ChildrenPicker);
+export default withStyles(styles)(SalesRulesPicker);
+

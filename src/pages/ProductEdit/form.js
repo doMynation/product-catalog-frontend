@@ -100,6 +100,20 @@ export default {
       isCompiled: child.isCompiled,
     }))
   },
+  salesRules: {
+    label: "Sales Rules",
+    validators: [rules => {
+      // @todo
+      return "";
+    }],
+    init: product => product.rules,
+    export: v => v.map(rule => ({
+      productId: rule.product.id,
+      ruleType: rule.ruleType,
+      newPrice: parseFloat(rule.newPrice),
+      quantity: rule.quantity,
+    }))
+  },
   imageUrl: {
     label: "Image",
     init: product => product.metadata.imageUrl,

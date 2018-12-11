@@ -47,7 +47,7 @@ class UpdateDiff extends React.PureComponent {
   }
 
   computeDiff = field => {
-    if (field.label === "Attributs" || field.label === "Children") return false;
+    if (field.label === "Attributs" || field.label === "Children" || field.label === "Sales Rules") return false;
 
     const hasError = field.checkError === undefined ? false : field.checkError && field.error !== "";
 

@@ -20,6 +20,7 @@ import AttributesTab from "./AttributesTab";
 import CompositionTab from "./CompositionTab";
 import ProductName from "../../shared/ProductName";
 import SaveDialog from "./SaveDialog";
+import SalesRulesTab from "./SalesRulesTab";
 
 const styles = theme => ({
   root: {
@@ -102,6 +103,7 @@ class Page extends Component {
                 {selectedTabIndex === "attributes" && <AttributesTab/>}
                 {selectedTabIndex === "translations" && <TranslationsTab/>}
                 {selectedTabIndex === "composition" && <CompositionTab children={product.children}/>}
+                {selectedTabIndex === "salesRules" && <SalesRulesTab salesRules={product.rules}/>}
               </Paper>
             </Grid>
           </Grid>

@@ -7,33 +7,38 @@ import connect from "react-redux/es/connect/connect";
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import compose from "redux/src/compose";
 import {updateField} from "./index";
-import ChildrenPicker from "../../shared/ChildrenPicker";
+import SalesRulesPicker from "../../shared/SalesRulesPicker";
 
 const styles = theme => ({});
 
-const CompositionTab = ({children, updateField}) => (
+const i18n = {
+  title: "Règles de vente",
+  help: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, dicta fugit illo labore laborum nihil nobis perferendis possimus recusandae soluta! Autem deleniti fuga impedit quibusdam rerum sequi voluptates voluptatibus? Impedit.",
+};
+
+const SalesRules = ({salesRules, updateField}) => (
   <Grid container spacing={24}>
     <Grid item xs={12}>
-      <Typography variant="title" gutterBottom><Icon fontSize="inherit">dashboard</Icon> Composition</Typography>
-      <Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda consequuntur deleniti dolorem, doloremque dolores ex facere in ipsum iure minus molestiae non nulla quam quas quia sed sint veritatis voluptatem.</Typography>
+      <Typography variant="title" gutterBottom><Icon fontSize="inherit">dashboard</Icon> {i18n.title}</Typography>
+      <Typography variant="body1">{i18n.help}</Typography>
     </Grid>
 
     <Grid item xs={12}>
-      <ChildrenPicker
-        children={children}
-        onChange={newChildren => updateField("children", newChildren)}
+      <SalesRulesPicker
+        salesRules={salesRules}
+        onChange={newSalesRules => updateField("salesRules", newSalesRules)}
       />
     </Grid>
   </Grid>
 );
 
-CompositionTab.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.object),
+SalesRules.propTypes = {
+  rules: PropTypes.arrayOf(PropTypes.object),
   updateField: PropTypes.func.isRequired
 };
 
 const mstp = ({productEdit}) => ({
-  children: productEdit.fields.children.value
+  salesRules: productEdit.fields.salesRules.value
 });
 
 const mdtp = dispatch => ({
@@ -43,4 +48,5 @@ const mdtp = dispatch => ({
 export default compose(
   withStyles(styles),
   connect(mstp, mdtp)
-)(CompositionTab);
+)(SalesRules);
+

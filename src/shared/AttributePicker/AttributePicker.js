@@ -7,11 +7,13 @@ import Icon from "@material-ui/core/es/Icon/Icon";
 import List from "@material-ui/core/es/List/List";
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import Collapse from "@material-ui/core/es/Collapse/Collapse";
-import SavedTemplates from "./SavedTemplates";
 import AutoComplete from "../AutoComplete";
 import moment from "moment";
 import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 import FormControlLabel from "@material-ui/core/es/FormControlLabel/FormControlLabel";
+import SavedTemplates from "../SavedTemplates/SavedTemplates";
+
+const LOCAL_STORAGE_KEY = "SavedTemplates::ATTRIBUTES";
 
 const styles = theme => ({
   header: {
@@ -45,7 +47,7 @@ class AttributePicker extends Component {
 
   componentDidMount() {
     // Load saved templates from localStorage
-    const data = localStorage.getItem("ATTRIBUTE_PICKER_TEMPLATES");
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
     const savedTemplates = data === null ? [] : JSON.parse(data);
 
     this.setState({savedTemplates: savedTemplates});
@@ -53,7 +55,7 @@ class AttributePicker extends Component {
 
   componentWillUnmount() {
     // Store saved templates in localStorage when the component is about to be destroyed
-    localStorage.setItem("ATTRIBUTE_PICKER_TEMPLATES", JSON.stringify(this.state.savedTemplates));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.state.savedTemplates));
   }
 
   toggleSavedTemplateMode = () => {

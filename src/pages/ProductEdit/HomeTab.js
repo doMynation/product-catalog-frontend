@@ -55,6 +55,9 @@ const styles = theme => ({
 
 const tagSuggestion = ["model", "kmo"].map(name => ({name: name}));
 const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/tiff'];
+const i18n = {
+  priceSectionTitle: "Prix et disponibilité"
+};
 
 class HomeTab extends Component {
   handleAddTag = ({name}) => {
@@ -102,10 +105,6 @@ class HomeTab extends Component {
   }
 
   render() {
-    const {fields, classes, updateField, categories, departments, extrusions} = this.props;
-    const tags = fields.tags.value.map(tag => ({name: tag}));
-    const defaultTranslationIdx = fields.translations.value.findIndex(tr => tr.isDefault);
-
     return (
       <Grid container spacing={24}>
         <Grid item xs={12}>
@@ -113,172 +112,175 @@ class HomeTab extends Component {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <Grid container spacing={24}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <TextField
-                  id="name"
-                  name="name"
-                  label="Nom *"
-                  value={fields.translations.value[defaultTranslationIdx].name}
-                  onChange={this.handleNameChange}
-                  error={Boolean(fields.translations.error[defaultTranslationIdx])}
-                />
-                {fields.translations.error[defaultTranslationIdx] !== "" &&
-                <FormHelperText error>{fields.translations.error[defaultTranslationIdx]}</FormHelperText>}
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  error={fields.sku.error !== ""}
-                  label="SKU *"
-                  id="sku"
-                  name="sku"
-                  onChange={this.handleChange}
-                  value={fields.sku.value}
-                />
-                {fields.sku.error &&
-                <FormHelperText error>{fields.sku.error}</FormHelperText>}
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <TextField
-                  error={fields.mpn.error !== ""}
-                  label="MPN"
-                  id="mpn"
-                  name="mpn"
-                  onChange={this.handleChange}
-                  value={fields.mpn.value}
-                />
-                {fields.mpn.error &&
-                <FormHelperText error>{fields.mpn.error}</FormHelperText>}
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={6}>
-              <CategoryPicker
-                id="categoryId"
-                name="categoryId"
-                label="Catégorie"
-                value={fields.categoryId.value}
-                categories={categories}
-                containerClass={classes.formControl}
-                formControlProps={{fullWidth: true}}
-                onChange={event => {
-                  const {name, value} = event.target;
-                  updateField(name, value);
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <FormControl className={classes.formControl} fullWidth>
-                <InputLabel htmlFor="departmentId">Département</InputLabel>
-                <Select
-                  value={fields.departmentId.value}
-                  onChange={event => {
-                    const {name, value} = event.target;
-                    updateField(name, value);
-                  }}
-                  inputProps={{
-                    id: 'departmentId',
-                    name: 'departmentId',
-                  }}>
-                  <MenuItem value={""}>Aucun</MenuItem>
-                  {Object.entries(departments).map(([idx, department]) => (
-                    <MenuItem key={idx} value={department.id}>{department.description.name}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="caption" paragraph>
-                La <strong>catégorie</strong> correspond au <strong>type du produit</strong>.
-                Par exemple, une vis fait partie de la catégorie Quincaillerie.
-              </Typography>
-              <Typography variant="caption" paragraph>
-                Le <strong>départment</strong> correspond au département qui <strong>gère le produit au niveau de la production</strong>.
-                Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
-              </Typography>
-              <Typography variant="caption" paragraph>
-                Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun.
-                Prenons l'exemple du DVD d'installation, dont la <strong>catégorie est Documentation</strong> et le <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
-              </Typography>
-            </Grid>
-
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel htmlFor="extrusionId">Extrusion</InputLabel>
-                <Select
-                  value={fields.extrusionId.value}
-                  renderValue={extrusionId => {
-                    const extrusion = extrusions[extrusionId];
-                    return (
-                      <div>
-                        <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.selectedExtrusion}/>
-                        {extrusion.templateName}
-                      </div>
-                    );
-                  }}
-                  onChange={event => {
-                    const {name, value} = event.target;
-                    updateField(name, value);
-                  }}
-                  inputProps={{
-                    id: 'extrusionId',
-                    name: 'extrusionId',
-                  }}>
-                  <MenuItem value={""}>Aucune</MenuItem>
-                  {Object.entries(extrusions).map(([idx, extrusion]) => (
-                    <MenuItem key={idx} value={extrusion.id}>
-                      <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.extrusionThumbnail}/>
-                      {extrusion.templateName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel htmlFor="stickerId">Étiquette</InputLabel>
-                <Select
-                  value={fields.stickerId.value}
-                  onChange={event => {
-                    const {name, value} = event.target;
-                    updateField(name, value);
-                  }}
-                  inputProps={{
-                    id: 'stickerId',
-                    name: 'stickerId',
-                  }}>
-                  <MenuItem value={""}>Aucune</MenuItem>
-                  <MenuItem value="1">Petit (4x1)</MenuItem>
-                  <MenuItem value="2">Gros (4x3)</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+          {this.renderLeftSide()}
         </Grid>
 
-        <Grid item xs={12} sm={6} className={classes.imageContainer}>
-          <Uploader
-            acceptedFileTypes={acceptedFileTypes}
-            files={fields.imageUrl.value !== "" ? [fields.imageUrl.value] : []}
-            onFilesChanged={files => {
-              const fileUrl = files[0] === undefined ? "" : files[0];
-              updateField("imageUrl", fileUrl)
+        <Grid item xs={12} sm={6}>
+          {this.renderRightSide()}
+        </Grid>
+      </Grid>
+    );
+  }
+
+  renderLeftSide() {
+    const {fields, classes, updateField, categories, departments, extrusions} = this.props;
+    const tags = fields.tags.value.map(tag => ({name: tag}));
+    const defaultTranslationIdx = fields.translations.value.findIndex(tr => tr.isDefault);
+
+    return (
+      <Grid container spacing={24}>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <TextField
+              id="name"
+              name="name"
+              label="Nom *"
+              value={fields.translations.value[defaultTranslationIdx].name}
+              onChange={this.handleNameChange}
+              error={Boolean(fields.translations.error[defaultTranslationIdx])}
+            />
+            {fields.translations.error[defaultTranslationIdx] !== "" &&
+            <FormHelperText error>{fields.translations.error[defaultTranslationIdx]}</FormHelperText>}
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              error={fields.sku.error !== ""}
+              label="SKU *"
+              id="sku"
+              name="sku"
+              onChange={this.handleChange}
+              value={fields.sku.value}
+            />
+            {fields.sku.error &&
+            <FormHelperText error>{fields.sku.error}</FormHelperText>}
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormControl fullWidth>
+            <TextField
+              error={fields.mpn.error !== ""}
+              label="MPN"
+              id="mpn"
+              name="mpn"
+              onChange={this.handleChange}
+              value={fields.mpn.value}
+            />
+            {fields.mpn.error &&
+            <FormHelperText error>{fields.mpn.error}</FormHelperText>}
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={6}>
+          <CategoryPicker
+            id="categoryId"
+            name="categoryId"
+            label="Catégorie"
+            value={fields.categoryId.value}
+            categories={categories}
+            containerClass={classes.formControl}
+            formControlProps={{fullWidth: true}}
+            onChange={event => {
+              const {name, value} = event.target;
+              updateField(name, value);
             }}
           />
         </Grid>
 
         <Grid item xs={6}>
+          <FormControl className={classes.formControl} fullWidth>
+            <InputLabel htmlFor="departmentId">Département</InputLabel>
+            <Select
+              value={fields.departmentId.value}
+              onChange={event => {
+                const {name, value} = event.target;
+                updateField(name, value);
+              }}
+              inputProps={{
+                id: 'departmentId',
+                name: 'departmentId',
+              }}>
+              <MenuItem value={""}>Aucun</MenuItem>
+              {Object.entries(departments).map(([idx, department]) => (
+                <MenuItem key={idx} value={department.id}>{department.description.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Typography variant="caption" paragraph>
+            La <strong>catégorie</strong> correspond au <strong>type du produit</strong>.
+            Par exemple, une vis fait partie de la catégorie Quincaillerie.
+          </Typography>
+          <Typography variant="caption" paragraph>
+            Le <strong>départment</strong> correspond au département qui <strong>gère le produit au niveau de la production</strong>.
+            Par exemple, une entremise en alumium est créée et gérée par le département de l'aluminium.
+          </Typography>
+          <Typography variant="caption" paragraph>
+            Notez qu'il existe des cas spéciaux, où la catégorie et le département n'ont rien en commun.
+            Prenons l'exemple du DVD d'installation, dont la <strong>catégorie est Documentation</strong> et le <strong>département Aluminium</strong>, car c'est ce dernier qui l'emballe.
+          </Typography>
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormControl fullWidth>
+            <InputLabel htmlFor="extrusionId">Extrusion</InputLabel>
+            <Select
+              value={fields.extrusionId.value}
+              renderValue={extrusionId => {
+                const extrusion = extrusions[extrusionId];
+                return (
+                  <div>
+                    <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.selectedExtrusion}/>
+                    {extrusion.templateName}
+                  </div>
+                );
+              }}
+              onChange={event => {
+                const {name, value} = event.target;
+                updateField(name, value);
+              }}
+              inputProps={{
+                id: 'extrusionId',
+                name: 'extrusionId',
+              }}>
+              <MenuItem value={""}>Aucune</MenuItem>
+              {Object.entries(extrusions).map(([idx, extrusion]) => (
+                <MenuItem key={idx} value={extrusion.id}>
+                  <img src={extrusion.imageUrl} alt={extrusion.name} className={classes.extrusionThumbnail}/>
+                  {extrusion.templateName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormControl fullWidth>
+            <InputLabel htmlFor="stickerId">Étiquette</InputLabel>
+            <Select
+              value={fields.stickerId.value}
+              onChange={event => {
+                const {name, value} = event.target;
+                updateField(name, value);
+              }}
+              inputProps={{
+                id: 'stickerId',
+                name: 'stickerId',
+              }}>
+              <MenuItem value={""}>Aucune</MenuItem>
+              <MenuItem value="1">Petit (4x1)</MenuItem>
+              <MenuItem value="2">Gros (4x3)</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12}>
           <ReactTags
             tags={tags}
             suggestions={tagSuggestion}
@@ -291,10 +293,20 @@ class HomeTab extends Component {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="title">Prix et disponibilité</Typography>
+          {this.renderToggles()}
         </Grid>
+      </Grid>
+    );
+  }
 
+  renderRightSide() {
+    const {fields} = this.props;
+
+    return (
+      <Grid container spacing={24}>
         <Grid item xs={12}>
+          <Typography variant="title">{i18n.priceSectionTitle}</Typography>
+
           <Grid container spacing={24}>
             <Grid item xs={3}>
               <FormControl fullWidth>
@@ -341,7 +353,14 @@ class HomeTab extends Component {
         </Grid>
 
         <Grid item xs={12}>
-          {this.renderToggles()}
+          <Uploader
+            acceptedFileTypes={acceptedFileTypes}
+            files={fields.imageUrl.value !== "" ? [fields.imageUrl.value] : []}
+            onFilesChanged={files => {
+              const fileUrl = files[0] === undefined ? "" : files[0];
+              updateField("imageUrl", fileUrl)
+            }}
+          />
         </Grid>
       </Grid>
     );

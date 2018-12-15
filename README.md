@@ -19,7 +19,7 @@ _For documentation and usage examples, please refer to the [Wiki](https://github
 
 ## Meta
 
-Distributed under the XYZ license. See ``LICENSE`` for more information.
+Distributed under the GPL 3.0 license. See ``LICENSE`` for more information.
 
 [https://github.com/domynation/product-catalog-frontend](https://github.com/domynation/product-catalog-frontend)
 

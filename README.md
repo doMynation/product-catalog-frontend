@@ -1,16 +1,28 @@
-A web-based product catalog with a bunch of [MRP](https://en.wikipedia.org/wiki/Material_requirements_planning) features.
+# Product Catalog API
+> A Web-based product catalog software built in React. For the back-end, see [Product Catalog API](https://github.com/doMynation/product-catalog) project.
 
-## Table of Contents
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-- [How To Install](#how-to-install)
-- [How To Contribute](#how-to-contribute)
-- [todo](#todo)
+![Preview](https://raw.githubusercontent.com/doMynation/product-catalog/master/docs/images/preview.png)
 
-## How To Install
+## Installation
 
-todo...
+```
+todo
+```
 
+## Documentation
 
-## How To Contribute
+todo
 
-todo...
+_For documentation and usage examples, please refer to the [Wiki](https://github.com/doMynation/product-catalog-frontend/wiki)_.
+
+## Meta
+
+Distributed under the XYZ license. See ``LICENSE`` for more information.
+
+[https://github.com/domynation/product-catalog-frontend](https://github.com/domynation/product-catalog-frontend)
+
+## Contributing
+
+todo

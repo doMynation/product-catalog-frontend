@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import withStyles from "@material-ui/core/es/styles/withStyles";
 import AutoComplete from "./AutoComplete";
-import ProductRepository from "../util/ProductRepository";
 import Collapse from "@material-ui/core/es/Collapse/Collapse";
 import Grid from "@material-ui/core/es/Grid/Grid";
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
@@ -10,14 +9,11 @@ import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import moment from "moment";
 import Loading from "./Loading";
-import {suggestProduct} from "../util/functions";
 import SavedTemplates from "./SavedTemplates/SavedTemplates";
-import SalesRule from "../pages/ProductEdit/SalesRule";
 
 const LOCAL_STORAGE_KEY = "SavedTemplates::SALES_RULES";
 const i18n = {
   autocompletePlaceholder: "Tapez le nom ou SKU d'un produit (ex: ATT90) ...",
-  toggleSavedTemplatesTooltip: "Listes sauvegardÃ©es"
 };
 
 const styles = theme => ({
@@ -26,15 +22,7 @@ const styles = theme => ({
   }
 });
 
-const createRule = product => ({
-  id: `NEW_${Math.random() * 20}`,
-  product: product,
-  ruleType: "normal",
-  newPrice: product.price,
-  quantity: 1,
-});
-
-class SalesRulesPicker extends Component {
+class Picker extends Component {
   state = {
     isSavedTemplateMode: false,
     isLoading: false,
@@ -69,12 +57,7 @@ class SalesRulesPicker extends Component {
     const newTemplate = {
       name: templateName,
       date: moment().format("YYYY-MM-DD H:mm"),
-      salesRules: this.props.salesRules.map(rule => ({
-        productId: rule.product.id,
-        ruleType: rule.ruleType,
-        newPrice: rule.newPrice,
-        quantity: rule.quantity,
-      }))
+      data: this.props.createSavedTemplate(this.props.data)
     };
 
     const newSavedTemplates = this.state.savedTemplates.concat([newTemplate]);
@@ -89,39 +72,12 @@ class SalesRulesPicker extends Component {
       return;
     }
 
-    // Fetch products
-    const productIds = template.salesRules.map(rule => rule.productId).join(",")
-
     this.setState({
       isLoading: true,
       isSavedTemplateMode: false
     });
 
-    ProductRepository
-      .get(productIds)
-      .then(apiProducts => {
-        const products = Array.isArray(apiProducts) ? apiProducts : [apiProducts];
-
-        const rules = template.salesRules.reduce((acc, rule) => {
-          const matchingProduct = products.find(product => product.id === rule.productId)
-
-          if (matchingProduct === undefined) {
-            return acc;
-          }
-
-          const newRule = createRule(matchingProduct);
-          newRule.ruleType = rule.ruleType;
-          newRule.newPrice = rule.newPrice;
-          newRule.quantity = rule.quantity;
-
-          return acc.concat(newRule);
-        }, []);
-
-        const newRules = this.props.salesRules.concat(rules);
-
-        this.setState({isLoading: false});
-        this.props.onChange(newRules)
-      });
+    this.props.onSelectSavedTemplate(idx);
   }
 
   toggleSavedTemplateMode = () => {
@@ -130,35 +86,22 @@ class SalesRulesPicker extends Component {
     }));
   }
 
-  handleAdd = product => {
-    // Prevent duplicates
-    const exists = this.props.salesRules.some(rule => rule.product.id === rule.id)
-
-    if (exists) {
-      return;
-    }
-
-    const newRules = this.props.salesRules.concat(createRule(product));
-
-    this.props.onChange(newRules);
-  }
-
   handleDelete = idx => {
-    const newRules = [...this.props.salesRules];
-    newRules.splice(idx, 1);
+    const newData = [...this.props.data];
+    newData.splice(idx, 1);
 
-    this.props.onChange(newRules);
+    this.props.onChange(newData);
   }
 
-  handleChange = (key, newRule) => {
-    const newRules = [...this.props.salesRules];
-    newRules[key] = newRule;
+  handleChange = (key, updatedData) => {
+    const newData = [...this.props.data];
+    newData[key] = updatedData;
 
-    this.props.onChange(newRules);
+    this.props.onChange(newData);
   }
 
   render() {
-    const {classes, salesRules, isLoading} = this.props;
+    const {classes, data, isLoading, onSelectData, onSearch, renderData, renderSearchResult} = this.props;
     const {isSavedTemplateMode, savedTemplates} = this.state;
 
     return (
@@ -167,17 +110,17 @@ class SalesRulesPicker extends Component {
           <Grid container alignItems="center" justify="space-around">
             <Grid item xs={11}>
               <AutoComplete
-                onChange={selected => this.handleAdd(selected.value)}
-                formatOption={({value}) => `[${value.sku}] ${value.description.name}`}
+                onChange={selected => onSelectData(selected.value)}
+                formatOption={({value}) => renderSearchResult(value)}
                 placeholder={i18n.autocompletePlaceholder}
                 isAsync
-                asyncFetch={suggestProduct}
+                asyncFetch={onSearch}
                 clearOnSelect
               />
             </Grid>
 
             <Grid item xs={1}>
-              <Tooltip title={i18n.toggleSavedTemplatesTooltip} placement="top">
+              <Tooltip title="Listes sauvegardées ..." placement="top">
                 <IconButton aria-label="" onClick={this.toggleSavedTemplateMode}>
                   <Icon>history</Icon>
                 </IconButton>
@@ -188,14 +131,12 @@ class SalesRulesPicker extends Component {
           {isLoading ?
             <div><Loading/></div> :
             <div className={classes.childrenContainer}>
-              {salesRules.map((rule, key) =>
-                <SalesRule
-                  key={`rule_${key}`}
-                  rule={rule}
-                  onChange={newRule => this.handleChange(key, newRule)}
-                  onDelete={() => this.handleDelete(key)}
-                />
-              )}
+              {data.map((item, key) => renderData({
+                key,
+                item,
+                defaultOnChange: this.handleChange,
+                defaultOnDelete: this.handleDelete
+              }))}
             </div>
           }
         </Collapse>
@@ -214,10 +155,36 @@ class SalesRulesPicker extends Component {
   }
 }
 
-SalesRulesPicker.propTypes = {
-  salesRules: PropTypes.arrayOf(PropTypes.object),
-  onChange: PropTypes.func.isRequired
+Picker.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object),
+  renderData: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
+  renderSearchResult: PropTypes.func.isRequired,
+  onSelectData: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  savedTemplates: PropTypes.arrayOf(PropTypes.object),
 };
 
-export default withStyles(styles)(SalesRulesPicker);
+/*
+// Usage example [wip]...
+      <Picker
+        onChange={newSalesRules => updateField("salesRules", newSalesRules)}
+        data={salesRules}
+        renderData={({key, item, defaultOnChange, defaultOnDelete}) =>
+          <SalesRule
+            key={`rule_${key}`}
+            rule={item}
+            onChange={newRule => defaultOnChange(key, newRule)}
+            onDelete={newRule => defaultOnDelete(key, newRule)}
+          />
+        }
+        onSelectData={product => createRule(product)}
+        onSearch={suggestProduct}
+        renderSearchResult={product => `[${product.sku}] ${product.description.name}`}
+        savedTemplates={getSavedTemplates()}
+        onSelectSavedTemplate={idx => console.log("selected " + idx)}
+        onDeleteSavedTemplate={idx => console.log("deleted " + idx)}
+      />
+ */
 
+export default withStyles(styles)(Picker);

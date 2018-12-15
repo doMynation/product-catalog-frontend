@@ -36,9 +36,7 @@ const SavedTemplates = ({classes, items, onSelect, onAdd, onDelete, onClose, all
   return (
     <div>
       <div className={classes.saveContainer}>
-        {allowSave &&
-        <SaveTemplateButton onSubmit={onAdd}/>
-        }
+        {allowSave && <SaveTemplateButton onSubmit={onAdd}/>}
 
         <Tooltip title="Retour" placement="top">
           <IconButton aria-label="Retour" onClick={onClose} style={{marginLeft: 'auto'}}>

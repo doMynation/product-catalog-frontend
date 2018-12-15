@@ -49,4 +49,3 @@ export default compose(
   withStyles(styles),
   connect(mstp, mdtp)
 )(SalesRules);
-

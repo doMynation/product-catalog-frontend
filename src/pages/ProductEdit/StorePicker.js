@@ -53,13 +53,14 @@ class StorePicker extends Component {
   }
 
   render() {
+    console.log(this.props.stores);
     return (
       <div>
         <h1>Disponibilités</h1>
         <p>Some help text here ...</p>
         <select onChange={this.handleSelection} value={this.state.selectedStore}>
           <option value="">Choisir ...</option>
-          {this.props.stores.map(store =>
+          {Object.entries(this.props.stores).map((key, store) =>
             <option key={'store_' + store.id} value={store.id}>{store.name}</option>
           )}
         </select>

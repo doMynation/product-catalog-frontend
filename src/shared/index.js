@@ -1,5 +1,8 @@
 import ProductRepository from "../util/ProductRepository";
 import {normalizeList} from "../util/functions";
+import Session from "../util/Session";
+
+export const SIGN_IN = 'auth/SIGN_IN';
 
 export const FETCH_SHARED_DATA_REQUEST = 'data/FETCH_SHARED_DATA_REQUEST';
 export const FETCH_SHARED_DATA_SUCCESS = 'data/FETCH_SHARED_DATA_SUCCESS';
@@ -10,6 +13,11 @@ export const LEFTMENU_OPEN = 'shared/LEFTMENU_OPEN';
 export const LEFTMENU_CLOSE = 'shared/LEFTMENU_CLOSE';
 export const NOTIFY_OPEN = 'shared/NOTIFY';
 export const NOTIFY_CLOSE = 'shared/NOTIFY_CLOSE';
+
+export const signIn = username => ({
+  type: SIGN_IN,
+  username
+});
 
 export const fetchSharedDataIfNeeded = onComplete => {
   return (dispatch, getState) => {
@@ -74,6 +82,7 @@ export const closeNotification = () => ({
 });
 
 export const initialState = {
+  isAuthenticated: Session.isAuthenticated(),
   isSessionExpired: false,
   isMenuOpen: false,
   notification: {
@@ -94,6 +103,11 @@ export const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SIGN_IN:
+      return {
+        ...state,
+        isAuthenticated: true,
+      };
     case RECEIVE_SHARED_BASE_DATA:
       return {
         ...state,

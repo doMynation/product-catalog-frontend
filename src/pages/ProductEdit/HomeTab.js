@@ -20,6 +20,7 @@ import Grid from "@material-ui/core/es/Grid/Grid";
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import Uploader from "../../shared/Uploader";
+import StorePicker from "./StorePicker";
 
 const styles = theme => ({
   switches: {
@@ -56,7 +57,8 @@ const styles = theme => ({
 const tagSuggestion = ["model", "kmo"].map(name => ({name: name}));
 const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/tiff'];
 const i18n = {
-  priceSectionTitle: "Prix et disponibilité"
+  priceSectionTitle: "Prix et disponibilité",
+  retailPrice: "Prix de détail",
 };
 
 class HomeTab extends Component {
@@ -305,15 +307,13 @@ class HomeTab extends Component {
     return (
       <Grid container spacing={24}>
         <Grid item xs={12}>
-          <Typography variant="title">{i18n.priceSectionTitle}</Typography>
-
           <Grid container spacing={24}>
             <Grid item xs={3}>
               <FormControl fullWidth>
                 <TextField
                   id="price"
                   name="price"
-                  label="Prix de détail"
+                  label={i18n.retailPrice}
                   value={fields.price.value}
                   type="number"
                   onChange={this.handleChange}
@@ -350,6 +350,13 @@ class HomeTab extends Component {
               </FormControl>
             </Grid>
           </Grid>
+
+          <StorePicker
+            stores={this.props.stores}
+            addedStores={[]}
+            handleAdd={s => console.log('added', s)}
+            handleDelete={s => console.log('deleted', s)}
+          />
         </Grid>
 
         <Grid item xs={12}>
@@ -436,6 +443,7 @@ const mstp = state => ({
   categories: state.shared.data.categories,
   departments: state.shared.data.departments,
   extrusions: state.shared.data.extrusions,
+  stores: state.shared.data.stores,
 });
 
 const mdtp = dispatch => ({

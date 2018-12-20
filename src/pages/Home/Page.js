@@ -7,6 +7,7 @@ import Button from "@material-ui/core/es/Button/Button";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import compose from "redux/src/compose";
 import withStyles from "@material-ui/core/es/styles/withStyles";
+import Layout from "../../layout/Layout";
 
 const styles = theme => ({
   root: {
@@ -24,30 +25,36 @@ const styles = theme => ({
   }
 });
 
-const Home = ({handleClick, isMenuOpen, classes}) => (
-  <div className={classes.root}>
-    <Paper className={classes.whiteBlock}>
-      <Typography variant="display1" color="inherit">
-        Module d'Inventaire
-      </Typography>
+const Home = ({handleClick, isMenuOpen, classes, isAuthenticated}) => (
+  <Layout>
+    <div className={classes.root}>
+      <Paper className={classes.whiteBlock}>
+        <Typography variant="display1" color="inherit">
+          Module d'Inventaire
+        </Typography>
 
-      <Typography variant="body2" color="inherit">Bienvenue dans le module d'inventaire. Ici, vous pouvez configurer les produits.</Typography>
+        <Typography variant="body2" color="inherit">Bienvenue dans le module d'inventaire. Ici, vous pouvez configurer les produits.</Typography>
 
-      <br/>
+        <br/>
 
-      <Button size="large" color="primary" variant="raised" onClick={handleClick}>
-        Commencez ici
-        <Icon className={classes.icon}>send</Icon>
-      </Button>
-    </Paper>
-  </div>
+        <Button size="large" color="primary" variant="raised" onClick={handleClick}>
+          Commencez ici
+          <Icon className={classes.icon}>send</Icon>
+        </Button>
+      </Paper>
+    </div>
+  </Layout>
 );
 
 const mdtp = dispatch => ({
   handleClick: () => dispatch(openMenu())
 });
 
+const mstp = ({shared}) => ({
+  isAuthenticated: shared.isAuthenticated
+});
+
 export default compose(
   withStyles(styles),
-  connect(null, mdtp)
+  connect(mstp, mdtp)
 )(Home);

@@ -114,18 +114,18 @@ class ProductRepository {
 
     const url = `${this.baseUrl}/products?${queryStringParams}`;
 
-    return request
-      .get(url)
-      .set('Accept', 'application/json')
-      .set(this._prepHeaders())
+    return this.prep(
+      request
+        .get(url)
+        .set(this._prepHeaders())
+    );
   }
 
   static get(productId) {
     const url = `${this.baseUrl}/products/${productId}`;
 
-    return request
+    return request()
       .get(url)
-      .set('Accept', 'application/json')
       .set(this._prepHeaders())
       .then(resp => resp.body);
   }
@@ -133,10 +133,7 @@ class ProductRepository {
   static getEditData(productId) {
     const url = `${this.baseUrl}/admin/products/${productId}`;
 
-    return request
-      .get(url)
-      .set('Accept', 'application/json')
-      .set(this._prepHeaders())
+    return this.prep(request.get(url))
       .then(resp => resp.body);
   }
 
@@ -198,6 +195,13 @@ class ProductRepository {
       "X-Api-Key": API_KEY,
       "Content-Type": "application/json"
     };
+  }
+
+  static prep(request) {
+    return request
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
+      .withCredentials();
   }
 }
 

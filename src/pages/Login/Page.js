@@ -12,6 +12,8 @@ import Api from "../../util/Api";
 import Session from "../../util/Session";
 import CircularProgress from "@material-ui/core/es/CircularProgress/CircularProgress";
 import Logo from '../../logo.png'
+import {signIn} from "../../shared/index";
+import Layout from "../../layout/Layout";
 
 const styles = theme => ({
   root: {
@@ -69,6 +71,8 @@ class Page extends React.Component {
         .then(resp => {
           Session.signIn(resp.data)
 
+          this.props.signIn(resp.data);
+
           // Redirect to home page
           this.props.history.push("/");
         })
@@ -90,81 +94,91 @@ class Page extends React.Component {
 
   render() {
     const {username, password, isLoading, error} = this.state;
-    const {classes} = this.props;
-    const hasUsernameError = username.value.trim() == "" && !username.isPristine;
-    const hasPasswordError = password.value.trim() == "" && !password.isPristine;
+    const {classes, isAuthenticated} = this.props;
+    const hasUsernameError = username.value.trim() === "" && !username.isPristine;
+    const hasPasswordError = password.value.trim() === "" && !password.isPristine;
 
     return (
-      <div className={classes.root}>
-        <Paper className={classes.whiteBlock}>
-          <img src={Logo} alt="Inventarius"/>
-          <Typography variant="body2" color="inherit">{i18n.help}</Typography>
+      <Layout showMenu={isAuthenticated} showHeader={isAuthenticated}>
+        <div className={classes.root}>
+          <Paper className={classes.whiteBlock}>
+            <img src={Logo} alt="Inventarius"/>
+            <Typography variant="body2" color="inherit">{i18n.help}</Typography>
 
-          {error && <Typography variant="caption" color="secondary"><Icon>error_outline</Icon> {error}</Typography>}
+            {error && <Typography variant="caption" color="secondary"><Icon>error_outline</Icon> {error}</Typography>}
 
-          <br/>
-          <br/>
+            <br/>
+            <br/>
 
-          <TextField
-            id="username-input"
-            label={i18n.username}
-            value={username.value}
-            onChange={e => this.setState({
-              username: {value: e.target.value, isPristine: false}
-            })}
-            onKeyPress={this.handleKeyPress}
-            error={hasUsernameError}
-            helperText={hasUsernameError ? i18n.errorRequired : ""}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Icon>account_circle</Icon>
-                </InputAdornment>
-              ),
-            }}
-          />
+            <TextField
+              id="username-input"
+              label={i18n.username}
+              value={username.value}
+              onChange={e => this.setState({
+                username: {value: e.target.value, isPristine: false}
+              })}
+              onKeyPress={this.handleKeyPress}
+              error={hasUsernameError}
+              helperText={hasUsernameError ? i18n.errorRequired : ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Icon>account_circle</Icon>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-          <br/>
-          <br/>
+            <br/>
+            <br/>
 
-          <TextField
-            id="password-input"
-            type="password"
-            value={password.value}
-            onKeyPress={this.handleKeyPress}
-            onChange={e => this.setState({
-              password: {value: e.target.value, isPristine: false}
-            })}
-            label={i18n.password}
-            error={hasPasswordError}
-            helperText={hasPasswordError ? i18n.errorRequired : ""}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Icon>lock</Icon>
-                </InputAdornment>
-              ),
-            }}
-          />
+            <TextField
+              id="password-input"
+              type="password"
+              value={password.value}
+              onKeyPress={this.handleKeyPress}
+              onChange={e => this.setState({
+                password: {value: e.target.value, isPristine: false}
+              })}
+              label={i18n.password}
+              error={hasPasswordError}
+              helperText={hasPasswordError ? i18n.errorRequired : ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Icon>lock</Icon>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-          <br/>
-          <br/>
-          <br/>
+            <br/>
+            <br/>
+            <br/>
 
-          <Button onClick={this.handleLogin} color="primary" disabled={isLoading}>
-            {i18n.buttonLabel}
-            <Icon>exit_to_app</Icon>
+            <Button onClick={this.handleLogin} color="primary" disabled={isLoading}>
+              {i18n.buttonLabel}
+              <Icon>exit_to_app</Icon>
 
-            {isLoading && <CircularProgress className={classes.loadingButton} size={20}/>}
-          </Button>
-        </Paper>
-      </div>
+              {isLoading && <CircularProgress className={classes.loadingButton} size={20}/>}
+            </Button>
+          </Paper>
+        </div>
+      </Layout>
     );
   }
 }
 
+const mdtp = dispatch => ({
+  signIn: user => dispatch(signIn(user))
+});
+
+const mstp = ({shared}) => ({
+  isAuthenticated: shared.isAuthenticated
+});
+
 export default compose(
   withStyles(styles),
-  connect(null, null)
+  connect(mstp, mdtp)
 )(Page);
 

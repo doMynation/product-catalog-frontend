@@ -8,7 +8,7 @@ import ListItem from "@material-ui/core/es/ListItem/ListItem";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
 import connect from "react-redux/es/connect/connect";
-import {closeMenu} from "../shared/index";
+import {closeMenu, signOut} from "../shared/index";
 import Session from "../util/Session";
 import {compose} from "redux";
 
@@ -16,6 +16,7 @@ class Menu extends React.Component {
   handleSignOut = () => {
     Session.signOut();
 
+    this.props.signOut();
     this.props.history.push("/login");
   }
 
@@ -61,7 +62,8 @@ const mstp = state => ({
 });
 
 const mdtp = dispatch => ({
-  onClose: () => dispatch(closeMenu())
+  onClose: () => dispatch(closeMenu()),
+  signOut: () => dispatch(signOut()),
 });
 
 Menu.propTypes = {

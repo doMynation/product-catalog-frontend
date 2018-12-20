@@ -21,6 +21,7 @@ import CompositionTab from "./CompositionTab";
 import ProductName from "../../shared/ProductName";
 import SaveDialog from "./SaveDialog";
 import SalesRulesTab from "./SalesRulesTab";
+import Layout from "../../layout/Layout";
 
 const styles = theme => ({
   root: {
@@ -67,11 +68,13 @@ class Page extends Component {
     const {classes} = this.props;
 
     return (
-      <div className={classes.root}>
-        {this.state.isLoading ? <Loading/> : this.renderForm()}
+      <Layout>
+        <div className={classes.root}>
+          {this.state.isLoading ? <Loading/> : this.renderForm()}
 
-        <SaveDialog/>
-      </div>
+          <SaveDialog/>
+        </div>
+      </Layout>
     );
   }
 

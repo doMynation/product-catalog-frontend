@@ -21,6 +21,7 @@ import BulkActionMenu from "./BulkActionMenu";
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Section from "../../layout/Section";
 import {fetchSharedDataIfNeeded} from "../../shared/index";
+import Layout from "../../layout/Layout";
 
 const styles = theme => ({
   root: {
@@ -67,68 +68,70 @@ class ProductSearchPage extends Component {
     const {classes, isBulkAttributeAddDialogOpen, selectedProducts, bulkEnable, bulkDisable, showAttributeAddDialog, categories, departments, attributes, stores} = this.props;
 
     return (
-      <div className={classes.root}>
-        <BulkAttributeAddDialog
-          isOpen={isBulkAttributeAddDialogOpen}
-          onClose={this.handleBulkAttributeClose}
-          availableAttributes={attributes}
-          selectedAttributes={this.state.selectedBulkAttributes}
-          onChange={this.handleBulkAttributeChange}
-          onSubmit={this.handleBulkAttributeAddSubmit}
-        />
+      <Layout>
+        <div className={classes.root}>
+          <BulkAttributeAddDialog
+            isOpen={isBulkAttributeAddDialogOpen}
+            onClose={this.handleBulkAttributeClose}
+            availableAttributes={attributes}
+            selectedAttributes={this.state.selectedBulkAttributes}
+            onChange={this.handleBulkAttributeChange}
+            onSubmit={this.handleBulkAttributeAddSubmit}
+          />
 
-        <Grid container>
-          <Grid item>
-            <PageHeader>Trouver un produit</PageHeader>
+          <Grid container>
+            <Grid item>
+              <PageHeader>Trouver un produit</PageHeader>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Section>
+                <Typography variant="subheading">
+                  Vous trouvez ci-dessous la liste de tous les produits. Appliquez un ou plusieurs filtres pour rafiner la liste de produits affichés.
+                </Typography>
+              </Section>
+            </Grid>
+
+            <Grid item xs={12} md={2} lg={2}>{''}</Grid>
+
+            <Grid item xs={12} md={10} lg={10}>
+              <div className={classes.bulkActionMenuContainer}>
+                {selectedProducts.length !== 0 &&
+                <BulkActionMenu
+                  onEnable={bulkEnable}
+                  onDisable={bulkDisable}
+                  onAttributeAdd={showAttributeAddDialog}
+                />
+                }
+              </div>
+            </Grid>
           </Grid>
 
-          <Grid item xs={12}>
-            <Section>
-              <Typography variant="subheading">
-                Vous trouvez ci-dessous la liste de tous les produits. Appliquez un ou plusieurs filtres pour rafiner la liste de produits affichés.
-              </Typography>
-            </Section>
-          </Grid>
+          <Grid container spacing={16}>
+            <Hidden smDown>
+              <Grid item xs={12} md={2} lg={2}>
+                <Paper elevation={8}>
+                  <TableFilters
+                    categories={categories}
+                    departments={departments}
+                    stores={stores}
+                  />
+                </Paper>
+              </Grid>
+            </Hidden>
 
-          <Grid item xs={12} md={2} lg={2}>{''}</Grid>
-
-          <Grid item xs={12} md={10} lg={10}>
-            <div className={classes.bulkActionMenuContainer}>
-              {selectedProducts.length !== 0 &&
-              <BulkActionMenu
-                onEnable={bulkEnable}
-                onDisable={bulkDisable}
-                onAttributeAdd={showAttributeAddDialog}
-              />
-              }
-            </div>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={16}>
-          <Hidden smDown>
-            <Grid item xs={12} md={2} lg={2}>
+            <Grid item xs={12} md={10} lg={10}>
               <Paper elevation={8}>
-                <TableFilters
-                  categories={categories}
-                  departments={departments}
-                  stores={stores}
+                <ProductSearchGrid
+                  isLoading={this.props.isLoading}
+                  data={this.props.products}
+                  rowsCount={this.props.productsCount}
                 />
               </Paper>
             </Grid>
-          </Hidden>
-
-          <Grid item xs={12} md={10} lg={10}>
-            <Paper elevation={8}>
-              <ProductSearchGrid
-                isLoading={this.props.isLoading}
-                data={this.props.products}
-                rowsCount={this.props.productsCount}
-              />
-            </Paper>
           </Grid>
-        </Grid>
-      </div>
+        </div>
+      </Layout>
     );
   }
 }

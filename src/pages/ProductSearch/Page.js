@@ -86,7 +86,7 @@ class ProductSearchPage extends Component {
 
             <Grid item xs={12}>
               <Section>
-                <Typography variant="subheading">
+                <Typography variant="subtitle1">
                   Vous trouvez ci-dessous la liste de tous les produits. Appliquez un ou plusieurs filtres pour rafiner la liste de produits affichés.
                 </Typography>
               </Section>

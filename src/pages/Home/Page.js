@@ -29,15 +29,15 @@ const Home = ({handleClick, isMenuOpen, classes, isAuthenticated}) => (
   <Layout>
     <div className={classes.root}>
       <Paper className={classes.whiteBlock}>
-        <Typography variant="display1" color="inherit">
+        <Typography variant="h4" color="inherit">
           Module d'Inventaire
         </Typography>
 
-        <Typography variant="body2" color="inherit">Bienvenue dans le module d'inventaire. Ici, vous pouvez configurer les produits.</Typography>
+        <Typography variant="body1" color="inherit">Bienvenue dans le module d'inventaire. Ici, vous pouvez configurer les produits.</Typography>
 
         <br/>
 
-        <Button size="large" color="primary" variant="raised" onClick={handleClick}>
+        <Button size="large" color="primary" variant="contained" onClick={handleClick}>
           Commencez ici
           <Icon className={classes.icon}>send</Icon>
         </Button>

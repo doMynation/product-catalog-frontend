@@ -110,7 +110,7 @@ class HomeTab extends Component {
     return (
       <Grid container spacing={24}>
         <Grid item xs={12}>
-          <Typography variant="title"><Icon>home</Icon> Accueil</Typography>
+          <Typography variant="h6"><Icon>home</Icon> Accueil</Typography>
         </Grid>
 
         <Grid item xs={12} sm={6}>

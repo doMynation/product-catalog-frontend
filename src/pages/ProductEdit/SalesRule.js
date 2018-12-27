@@ -54,12 +54,12 @@ const styles = theme => ({
 
 class SalesRule extends Component {
   toggleIncluded = () => {
-    const currentType = this.props.rule.ruleType;
+    const newType = this.props.rule.ruleType === RULE_TYPES.INCLUDED ? RULE_TYPES.NORMAL : RULE_TYPES.INCLUDED;
 
     this.props.onChange({
       ...this.props.rule,
-      ruleType: currentType === RULE_TYPES.INCLUDED ? RULE_TYPES.NORMAL : RULE_TYPES.INCLUDED,
-      newPrice: currentType === RULE_TYPES.INCLUDED ? 0.00 : this.props.rule.newPrice
+      ruleType: newType,
+      newPrice: newType === RULE_TYPES.INCLUDED ? 0.00 : this.props.rule.newPrice
     });
   }
 
@@ -99,9 +99,9 @@ class SalesRule extends Component {
 
         <Grid item>
           <Grid container alignItems="center" className={classes.spaced}>
-            {rule.ruleType !== RULE_TYPES.INCLUDED &&
             <Grid item>
               <TextField
+                disabled={rule.ruleType === RULE_TYPES.INCLUDED}
                 label={i18n.inputLabel.price}
                 placeholder="Ex: 10.45"
                 onChange={e => this.handlePriceChange(e.target.value)}
@@ -114,13 +114,12 @@ class SalesRule extends Component {
                 }}
               />
             </Grid>
-            }
 
-            {(rule.ruleType === RULE_TYPES.INCLUDED || rule.ruleType === RULE_TYPES.MANDATORY) &&
             <Grid item>
               <FormControl>
                 <InputLabel>{i18n.inputLabel.quantity}</InputLabel>
                 <Select
+                  disabled={rule.ruleType !== RULE_TYPES.INCLUDED && rule.ruleType !== RULE_TYPES.MANDATORY}
                   value={rule.quantity}
                   onChange={e => this.handleQuantityChange(e.target.value)}
                   inputProps={{
@@ -132,7 +131,6 @@ class SalesRule extends Component {
                 </Select>
               </FormControl>
             </Grid>
-            }
 
             <Grid item>
               <Tooltip title={i18n.typeIncluded}>

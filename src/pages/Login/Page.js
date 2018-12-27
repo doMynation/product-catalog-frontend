@@ -91,13 +91,14 @@ class Page extends React.Component {
     const {classes, isAuthenticated} = this.props;
     const hasUsernameError = username.value.trim() === "" && !username.isPristine;
     const hasPasswordError = password.value.trim() === "" && !password.isPristine;
+    const isFormComplete = username.value !== "" && password.value !== "";
 
     return (
       <Layout showMenu={isAuthenticated} showHeader={isAuthenticated}>
         <div className={classes.root}>
           <Paper className={classes.whiteBlock}>
             <img src={Logo} alt="Inventarius"/>
-            <Typography variant="body2" color="inherit">{i18n.help}</Typography>
+            <Typography variant="body1" color="inherit">{i18n.help}</Typography>
 
             {error && <Typography variant="caption" color="secondary"><Icon>error_outline</Icon> {error}</Typography>}
 
@@ -150,7 +151,7 @@ class Page extends React.Component {
             <br/>
             <br/>
 
-            <Button onClick={this.handleLogin} color="primary" disabled={isLoading}>
+            <Button onClick={this.handleLogin} color="primary" disabled={isLoading || !isFormComplete}>
               {i18n.buttonLabel}
               <Icon>exit_to_app</Icon>
 

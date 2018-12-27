@@ -12,7 +12,7 @@ const Header = ({handleClick}) => (
   <AppBar position="static" color="primary">
     <Toolbar>
       <IconButton color="inherit" onClick={handleClick}><Icon>menu</Icon></IconButton>
-      <Typography variant="title" color="inherit">Inventaire</Typography>
+      <Typography variant="h6" color="inherit">Inventaire</Typography>
     </Toolbar>
   </AppBar>
 );

@@ -19,8 +19,8 @@ const i18n = {
 const SalesRules = ({salesRules, updateField}) => (
   <Grid container spacing={24}>
     <Grid item xs={12}>
-      <Typography variant="title" gutterBottom><Icon fontSize="inherit">dashboard</Icon> {i18n.title}</Typography>
-      <Typography variant="body1">{i18n.help}</Typography>
+      <Typography variant="h6" gutterBottom><Icon fontSize="inherit">dashboard</Icon> {i18n.title}</Typography>
+      <Typography>{i18n.help}</Typography>
     </Grid>
 
     <Grid item xs={12}>

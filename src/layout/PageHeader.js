@@ -23,7 +23,7 @@ const styles = theme => ({
 
 const PageHeader = ({children, classes, text, icon = null}) => (
   <div className={classes.root}>
-    <Typography variant="display1" className={classes.text}>
+    <Typography variant="h4" className={classes.text}>
       {children}
     </Typography>
   </div>

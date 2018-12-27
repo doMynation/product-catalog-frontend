@@ -47,7 +47,7 @@ const SavedTemplates = ({classes, items, onSelect, onAdd, onDelete, onClose, all
 
       <div className={classes.templatesHeader}>
         <Icon style={{marginRight: 8}}>history</Icon>
-        <Typography variant="title">Listes sauvegardées</Typography>
+        <Typography variant="h6">Listes sauvegardées</Typography>
       </div>
 
       <List dense>

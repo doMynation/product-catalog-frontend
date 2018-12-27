@@ -4,7 +4,6 @@ import withStyles from "@material-ui/core/es/styles/withStyles";
 import TableRow from "@material-ui/core/es/TableRow/TableRow";
 import TableCell from "@material-ui/core/es/TableCell/TableCell";
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
-import Button from "@material-ui/core/es/Button/Button";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import Link from "react-router-dom/es/Link";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
@@ -14,6 +13,7 @@ import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
+import Fab from "@material-ui/core/es/Fab/Fab";
 
 const styles = theme => ({
   row: theme.table.rows.striped,
@@ -120,14 +120,14 @@ class SearchResult extends React.Component {
 
         <Hidden smDown>
           <TableCell className={cellClass}>{product.description.name}</TableCell>
-          <TableCell numeric={true} style={{minWidth: '130px'}} className={cellClass}>{product.price.toFixed(2)} $</TableCell>
+          <TableCell style={{minWidth: '130px'}} className={cellClass}>{product.price.toFixed(2)} $</TableCell>
         </Hidden>
 
         <TableCell style={{width: '200px'}}>
           <Tooltip title="Consulter">
-            <Button mini variant="fab" color="primary" component={Link} to={'/products/' + product.id} className={classes.button}>
+            <Fab size="small" color="primary" component={Link} to={'/products/' + product.id} className={classes.button}>
               <Icon>search</Icon>
-            </Button>
+            </Fab>
           </Tooltip>
 
           <IconButton onClick={this.handleMore}>

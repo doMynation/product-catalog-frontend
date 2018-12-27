@@ -14,8 +14,8 @@ const styles = theme => ({});
 const CompositionTab = ({children, updateField}) => (
   <Grid container spacing={24}>
     <Grid item xs={12}>
-      <Typography variant="title" gutterBottom><Icon fontSize="inherit">dashboard</Icon> Composition</Typography>
-      <Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda consequuntur deleniti dolorem, doloremque dolores ex facere in ipsum iure minus molestiae non nulla quam quas quia sed sint veritatis voluptatem.</Typography>
+      <Typography variant="h6" gutterBottom><Icon fontSize="inherit">dashboard</Icon> Composition</Typography>
+      <Typography>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda consequuntur deleniti dolorem, doloremque dolores ex facere in ipsum iure minus molestiae non nulla quam quas quia sed sint veritatis voluptatem.</Typography>
     </Grid>
 
     <Grid item xs={12}>

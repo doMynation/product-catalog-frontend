@@ -27,7 +27,7 @@ const SectionHeader = ({children, classes, text, icon = null}) => (
   <div className={classes.root}>
     {icon !== null && <Icon className={classes.icon}>{icon}</Icon>}
 
-    <Typography variant="title" className={classes.text}>
+    <Typography variant="h6" className={classes.text}>
       {text}
     </Typography>
   </div>

@@ -1,14 +1,14 @@
 import React from 'react';
 import Route from "react-router-dom/es/Route";
 import {Redirect} from "react-router-dom";
-import Session from "../../util/Session";
+import {connect} from "react-redux";
 
-const ProtectedRoute = ({component: Component, ...rest}) => {
+const ProtectedRoute = ({component: Component, isAuthenticated, ...rest}) => {
   return (
     <Route
       {...rest}
       render={props =>
-        Session.isAuthenticated() ? (
+        isAuthenticated ? (
           <Component {...props} />
         ) : (
           <Redirect
@@ -23,4 +23,9 @@ const ProtectedRoute = ({component: Component, ...rest}) => {
   );
 }
 
-export default ProtectedRoute;
+const mstp = ({shared}) => ({
+  isAuthenticated: shared.isAuthenticated
+});
+
+export default connect(mstp, null)(ProtectedRoute);
+

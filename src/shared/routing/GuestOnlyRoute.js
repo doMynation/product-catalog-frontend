@@ -1,14 +1,14 @@
 import React from 'react';
 import Route from "react-router-dom/es/Route";
 import {Redirect} from "react-router-dom";
-import Session from "../../util/Session";
+import {connect} from "react-redux";
 
-const GuestOnlyRoute = ({component: Component, fallbackPath, ...rest}) => {
+const GuestOnlyRoute = ({component: Component, fallbackPath, isAuthenticated, ...rest}) => {
   return (
     <Route
       {...rest}
       render={props =>
-        !Session.isAuthenticated() ? (
+        !isAuthenticated ? (
           <Component {...props} />
         ) : (
           <Redirect
@@ -23,5 +23,9 @@ const GuestOnlyRoute = ({component: Component, fallbackPath, ...rest}) => {
   );
 }
 
-export default GuestOnlyRoute;
+const mstp = ({shared}) => ({
+  isAuthenticated: shared.isAuthenticated
+});
+
+export default connect(mstp, null)(GuestOnlyRoute);
 

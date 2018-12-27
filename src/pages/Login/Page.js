@@ -9,7 +9,6 @@ import withStyles from "@material-ui/core/es/styles/withStyles";
 import TextField from "@material-ui/core/es/TextField/TextField";
 import InputAdornment from "@material-ui/core/es/InputAdornment/InputAdornment";
 import Api from "../../util/Api";
-import Session from "../../util/Session";
 import CircularProgress from "@material-ui/core/es/CircularProgress/CircularProgress";
 import Logo from '../../logo.png'
 import {signIn} from "../../shared/index";
@@ -69,12 +68,7 @@ class Page extends React.Component {
       Api
         .login(username, password)
         .then(resp => {
-          Session.signIn(resp.data)
-
           this.props.signIn(resp.data);
-
-          // Redirect to home page
-          this.props.history.push("/");
         })
         .catch(err => {
           this.setState({
@@ -82,7 +76,7 @@ class Page extends React.Component {
             password: {value: "", isPristine: false},
             error: i18n.error,
           });
-        });
+        })
     }, 1000);
   }
 

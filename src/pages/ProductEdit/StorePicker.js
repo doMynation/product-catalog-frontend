@@ -53,7 +53,6 @@ class StorePicker extends Component {
   }
 
   render() {
-    console.log(this.props.stores);
     return (
       <div>
         <h1>Disponibilités</h1>

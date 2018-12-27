@@ -1,5 +1,5 @@
 import ProductRepository from "../../util/ProductRepository";
-import {openNotification, showUnauthorized} from "../../shared/index";
+import {openNotification} from "../../shared/index";
 import initialState from './initialState';
 
 export const FILTER = 'productSearch/FILTER';
@@ -49,8 +49,8 @@ export const cloneProduct = productId => {
     dispatch({type: CLONE_START});
 
     ProductRepository.cloneProduct(productId)
-      .then(resp => {
-        dispatch(openNotification(`Le produit [${resp.body.data.sku}] a été créé avec succès.`));
+      .then(data => {
+        dispatch(openNotification(`Le produit [${data.sku}] a été créé avec succès.`));
         dispatch(performSearch());
       })
       .catch(err => {
@@ -187,22 +187,11 @@ export const performSearch = () => {
     dispatch({type: SEARCH_START});
 
     ProductRepository.searchProducts(filters, sortField, sortDescending, offset, state.pageSize)
-    // .timeout(2000)
-      .then(resp => {
-        const json = resp.body;
-
-        dispatch(receiveResults(json.data, parseInt(json.meta.count, 10)));
+      .then(data => {
+        dispatch(receiveResults(data.data, parseInt(data.meta.count, 10)));
       })
       .catch(err => {
-        if (err.timeout) {
-          console.log("handle timeout");
-        } else if (!("response" in err)) {
-          dispatch(showUnauthorized());
-        } else if (err.response.unauthorized) {
-          dispatch(showUnauthorized());
-        } else if (err.response.forbidden) {
-          console.log("handle forbidden");
-        }
+        console.log("error occurred", err);
       });
   };
 };

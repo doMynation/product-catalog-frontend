@@ -1,25 +1,43 @@
 import ProductRepository from "../util/ProductRepository";
 import {normalizeList} from "../util/functions";
+import Session from "../util/Session";
+import {push} from 'connected-react-router';
 
 export const SIGN_IN = 'auth/SIGN_IN';
 export const SIGN_OUT = 'auth/SIGN_OUT';
+export const EXPIRE_SESSION = 'auth/EXPIRE_SESSION';
+export const ACK_SESSION_EXPIRED = 'auth/ACK_SESSION_EXPIRED';
 
 export const FETCH_SHARED_DATA_REQUEST = 'data/FETCH_SHARED_DATA_REQUEST';
 export const FETCH_SHARED_DATA_SUCCESS = 'data/FETCH_SHARED_DATA_SUCCESS';
 export const RECEIVE_SHARED_BASE_DATA = 'data/RECEIVE_SHARED_BASE_DATA';
 
-export const SHOW_UNAUTHORIZED = 'auth/SHOW_UNAUTHORIZED';
 export const LEFTMENU_OPEN = 'shared/LEFTMENU_OPEN';
 export const LEFTMENU_CLOSE = 'shared/LEFTMENU_CLOSE';
 export const NOTIFY_OPEN = 'shared/NOTIFY';
 export const NOTIFY_CLOSE = 'shared/NOTIFY_CLOSE';
 
-export const signIn = username => ({
-  type: SIGN_IN,
-  username
-});
+export const signIn = user => {
+  return dispatch => {
+    Session.signIn(user);
 
-export const signOut = () => ({type: SIGN_OUT});
+    dispatch({type: SIGN_IN, username: user.username});
+
+    // Redirect to home page
+    dispatch(push('/'));
+  };
+};
+
+export const signOut = () => {
+  return dispatch => {
+    Session.signOut()
+
+    dispatch({type: SIGN_OUT});
+
+    // Redirect to login page
+    dispatch(push('/login'));
+  };
+};
 
 export const fetchSharedDataIfNeeded = onComplete => {
   return (dispatch, getState) => {
@@ -51,7 +69,7 @@ export const fetchSharedDataIfNeeded = onComplete => {
       onComplete();
     });
   };
-}
+};
 
 export const receiveSharedData = (name, data) => ({
   type: FETCH_SHARED_DATA_SUCCESS,
@@ -59,9 +77,17 @@ export const receiveSharedData = (name, data) => ({
   data
 });
 
-export const showUnauthorized = () => ({
-  type: SHOW_UNAUTHORIZED
+export const expireSession = () => ({
+  type: EXPIRE_SESSION
 });
+
+export const acknowledgeSessionExpired = () => {
+  return dispatch => {
+    dispatch({type: ACK_SESSION_EXPIRED});
+
+    dispatch(push('/login'));
+  };
+};
 
 export const openMenu = () => ({
   type: LEFTMENU_OPEN
@@ -147,10 +173,16 @@ export default (state = initialState, action) => {
           isOpen: false
         }
       };
-    case SHOW_UNAUTHORIZED:
+    case EXPIRE_SESSION:
       return {
         ...state,
         isSessionExpired: true
+      };
+    case ACK_SESSION_EXPIRED:
+      return {
+        ...state,
+        isSessionExpired: false,
+        isAuthenticated: false,
       };
     case LEFTMENU_OPEN:
       return {

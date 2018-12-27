@@ -1,19 +1,12 @@
-import * as request from "superagent";
-import {API_URL} from "../conf";
+import sessionClient from "../sessionClient";
 
 class Api {
   static login(username, password) {
-    const url = `${API_URL}/auth`;
-
-    return request
-      .post(url)
-      .withCredentials()
-      .send({
+    return sessionClient
+      .post('/auth', {
         username: username,
         password: password
-      })
-      .set('Accept', 'application/json')
-      .then(resp => resp.body);
+      });
   }
 }
 

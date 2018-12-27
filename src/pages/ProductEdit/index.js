@@ -46,17 +46,15 @@ export const saveProduct = () => (dispatch, getState) => {
 
   ProductRepository
     .updateProduct(currentState.product.id, currentState.product.hash, fields)
-    .then(resp => {
-      const json = resp.body;
-
-      dispatch({type: SAVE_PRODUCT_SUCCESS, hash: json.data.hash});
+    .then(data => {
+      // dispatch({type: SAVE_PRODUCT_SUCCESS, hash: data.hash});
       dispatch(openNotification("Le produit a été mis à jour avec succès."))
 
       // Reload the product and re-initialise the state
       ProductRepository
         .getEditData(currentState.product.id)
-        .then(resp => {
-          dispatch(init(resp.data));
+        .then(data => {
+          dispatch(init(data));
         });
     })
     .catch(err => {

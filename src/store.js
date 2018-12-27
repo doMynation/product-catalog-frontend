@@ -4,9 +4,10 @@ import thunk from 'redux-thunk';
 import compose from "redux/src/compose";
 import {initialState as sharedState} from "./shared/index";
 import Session from "./util/Session";
+import {routerMiddleware} from 'connected-react-router'
 
-export const store = createStore(
-  rootReducer,
+export default (history) => createStore(
+  rootReducer(history),
   {
     shared: {
       ...sharedState,
@@ -14,7 +15,10 @@ export const store = createStore(
     }
   },
   compose(
-    applyMiddleware(thunk),
+    applyMiddleware(
+      thunk,
+      routerMiddleware(history),
+    ),
     window.__REDUX_DEVTOOLS_EXTENSION__ ? window.__REDUX_DEVTOOLS_EXTENSION__() : f => f
   )
 );

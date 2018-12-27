@@ -47,9 +47,9 @@ class Page extends Component {
   componentDidMount() {
     ProductRepository
       .getEditData(this.state.productId)
-      .then(json => {
+      .then(data => {
         this.props.fetchSharedDataIfNeeded(() => {
-          this.props.init(json.data);
+          this.props.init(data);
 
           this.setState({
             isLoading: false,

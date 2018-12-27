@@ -37,7 +37,7 @@ class Window extends React.Component {
       <Dialog
         open={isOpen}
         onClose={onClose}
-        aria-labelledby="Confirmer les changements"
+        aria-labelledby={title}
       >
         <DialogTitle id="form-dialog-title">{title}</DialogTitle>
         <DialogContent>
@@ -62,6 +62,8 @@ Window.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(Window);

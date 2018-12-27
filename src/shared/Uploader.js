@@ -26,7 +26,12 @@ const i18n = {
 
 const serverConfig = {
   url: API_URL,
-  process: '/admin/upload',
+  // process: '/admin/upload',
+  process: {
+    url: '/admin/upload',
+    withCredentials: true,
+    timeout: 7000,
+  },
   revert: null,
   restore: null,
   load: '/uploads/',

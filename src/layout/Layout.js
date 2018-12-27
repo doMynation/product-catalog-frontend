@@ -6,6 +6,7 @@ import Header from "./Header";
 import Menu from "./Menu";
 import Notification from "../shared/Notification";
 import BgImage from './images/dark-material-bg.jpg';
+import UnauthorizedDialog from "../shared/UnauthorizedDialog";
 
 const styles = theme => ({
   root: {
@@ -26,6 +27,7 @@ const Layout = ({classes, showMenu = true, showHeader = true, children}) => (
       {showMenu && <Menu/>}
 
       <Notification/>
+      <UnauthorizedDialog/>
     </Grid>
 
     <Grid container className={classes.content}>

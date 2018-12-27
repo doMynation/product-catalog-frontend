@@ -302,7 +302,7 @@ class HomeTab extends Component {
   }
 
   renderRightSide() {
-    const {fields} = this.props;
+    const {fields, updateField} = this.props;
 
     return (
       <Grid container spacing={24}>
@@ -351,12 +351,12 @@ class HomeTab extends Component {
             </Grid>
           </Grid>
 
-          <StorePicker
-            stores={this.props.stores}
-            addedStores={[]}
-            handleAdd={s => console.log('added', s)}
-            handleDelete={s => console.log('deleted', s)}
-          />
+          {/*<StorePicker*/}
+          {/*stores={this.props.stores}*/}
+          {/*addedStores={[]}*/}
+          {/*handleAdd={s => console.log('added', s)}*/}
+          {/*handleDelete={s => console.log('deleted', s)}*/}
+          {/*/>*/}
         </Grid>
 
         <Grid item xs={12}>
@@ -365,7 +365,7 @@ class HomeTab extends Component {
             files={fields.imageUrl.value !== "" ? [fields.imageUrl.value] : []}
             onFilesChanged={files => {
               const fileUrl = files[0] === undefined ? "" : files[0];
-              updateField("imageUrl", fileUrl)
+              updateField("imageUrl", fileUrl);
             }}
           />
         </Grid>

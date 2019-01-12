@@ -13,7 +13,6 @@ import Checkbox from "@material-ui/core/es/Checkbox/Checkbox";
 import ListItemIcon from "@material-ui/core/es/ListItemIcon/ListItemIcon";
 import ListItemText from "@material-ui/core/es/ListItemText/ListItemText";
 import Hidden from "@material-ui/core/es/Hidden/Hidden";
-import Fab from "@material-ui/core/es/Fab/Fab";
 
 const styles = theme => ({
   row: theme.table.rows.striped,
@@ -125,9 +124,9 @@ class SearchResult extends React.Component {
 
         <TableCell style={{width: '200px'}}>
           <Tooltip title="Consulter">
-            <Fab size="small" color="primary" component={Link} to={'/products/' + product.id} className={classes.button}>
+            <IconButton size="small" component={Link} to={'/products/' + product.id} className={classes.button}>
               <Icon>search</Icon>
-            </Fab>
+            </IconButton>
           </Tooltip>
 
           <IconButton onClick={this.handleMore}>

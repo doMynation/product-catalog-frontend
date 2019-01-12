@@ -1,6 +1,5 @@
 import React from 'react';
 import Typography from "@material-ui/core/es/Typography/Typography";
-import Paper from "@material-ui/core/es/Paper/Paper";
 import connect from "react-redux/es/connect/connect";
 import Button from "@material-ui/core/es/Button/Button";
 import Icon from "@material-ui/core/es/Icon/Icon";
@@ -13,31 +12,84 @@ import CircularProgress from "@material-ui/core/es/CircularProgress/CircularProg
 import Logo from '../../logo.png'
 import {signIn} from "../../shared/index";
 import Layout from "../../layout/Layout";
+import Alert from "../../shared/Alert";
+import Grid from "@material-ui/core/es/Grid/Grid";
+import Hidden from "@material-ui/core/es/Hidden/Hidden";
 
 const styles = theme => ({
   root: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'center',
+  },
+  section: {
+    marginTop: theme.spacing.unit * 3,
+  },
+  leftSide: {
+    display: 'flex',
     alignItems: 'center',
-  },
-  whiteBlock: {
+    backgroundColor: '#fbfbfb',
     padding: theme.spacing.unit * 3,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  icon: {
-    paddingLeft: theme.spacing.unit
+  leftSideInner: {
+    width: '100%',
+    padding: theme.spacing.unit * 2,
   },
-  loadingButton: {...theme.buttonProgress}
+  leftTitle: {
+    textTransform: 'uppercase',
+  },
+  forgotPasswordContainer: {
+    textAlign: 'center',
+    marginTop: theme.spacing.unit,
+  },
+  forgotPasswordButton: {
+    color: 'blue',
+    fontSize: 10
+  },
+  rightSide: {
+    display: 'flex',
+    alignItems: 'center',
+    color: '#fbfbfb',
+  },
+  rightSideInner: {
+    textAlign: 'center',
+    width: '100%',
+    paddingBottom: theme.spacing.unit * 3,
+  },
+  rightSideText: {
+    textAlign: 'left',
+    color: '#fbfbfb',
+    margin: '0 auto',
+    width: '50%',
+  },
+  rightSideBody: {
+    textAlign: 'justify',
+  },
+  logo: {
+    marginTop: -20,
+    marginBottom: -20,
+  },
+  loadingButton: {...theme.buttonProgress},
+  usernameInput: {
+    marginBottom: theme.spacing.unit * 2,
+  },
+  adornment: {
+    color: theme.colors.disabled
+  },
 });
 
 const i18n = {
+  leftTitle: "Se Connecter",
+  rightTitle: "Bienvenue dans Inventarius",
+  rightBody: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad commodi consequuntur fugit minus non qui reprehenderit saepe voluptate. Aspernatur blanditiis corporis, esse facilis impedit nisi quis reprehenderit similique voluptates voluptatibus.",
   help: "Veuillez entrer votre nom d'utilisateur et votre mot de passe.",
   username: "Nom d'utilisateur",
   password: "Mot de passe",
   buttonLabel: "Connexion",
-  error: "Combination de nom d'utilisateur et mot de passe invalide.",
+  errorTitle: "Erreur",
+  errorMessage: "Combination de nom d'utilisateur et mot de passe invalide.",
   errorRequired: "Obligatoire",
+  forgotPassword: "J'ai oublié mon mot de passe",
 };
 
 class Page extends React.Component {
@@ -74,7 +126,7 @@ class Page extends React.Component {
           this.setState({
             isLoading: false,
             password: {value: "", isPristine: false},
-            error: i18n.error,
+            error: i18n.errorMessage,
           });
         })
     }, 1000);
@@ -95,71 +147,102 @@ class Page extends React.Component {
 
     return (
       <Layout showMenu={isAuthenticated} showHeader={isAuthenticated}>
-        <div className={classes.root}>
-          <Paper className={classes.whiteBlock}>
-            <img src={Logo} alt="Inventarius"/>
-            <Typography variant="body1" color="inherit">{i18n.help}</Typography>
+        <Hidden mdUp>
+          {this.renderRightSide()}
+        </Hidden>
 
-            {error && <Typography variant="caption" color="secondary"><Icon>error_outline</Icon> {error}</Typography>}
+        <Grid container className={classes.root}>
+          <Grid item className={classes.leftSide} xs={12} md={4}>
+            <div className={classes.leftSideInner}>
+              <div className={classes.section}>
+                <Typography variant="h5" className={classes.leftTitle}>{i18n.leftTitle}</Typography>
 
-            <br/>
-            <br/>
+                {error && <Alert title={i18n.errorTitle} description={i18n.errorMessage}/>}
+              </div>
 
-            <TextField
-              id="username-input"
-              label={i18n.username}
-              value={username.value}
-              onChange={e => this.setState({
-                username: {value: e.target.value, isPristine: false}
-              })}
-              onKeyPress={this.handleKeyPress}
-              error={hasUsernameError}
-              helperText={hasUsernameError ? i18n.errorRequired : ""}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Icon>account_circle</Icon>
-                  </InputAdornment>
-                ),
-              }}
-            />
+              <div className={classes.section}>
+                <TextField
+                  className={classes.usernameInput}
+                  fullWidth
+                  id="username-input"
+                  variant="outlined"
+                  label={i18n.username}
+                  value={username.value}
+                  onChange={e => this.setState({
+                    username: {value: e.target.value, isPristine: false}
+                  })}
+                  onKeyPress={this.handleKeyPress}
+                  error={hasUsernameError}
+                  helperText={hasUsernameError ? i18n.errorRequired : ""}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end" className={classes.adornment}>
+                        <Icon>account_circle</Icon>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-            <br/>
-            <br/>
+                <TextField
+                  fullWidth
+                  id="password-input"
+                  variant="outlined"
+                  type="password"
+                  value={password.value}
+                  onKeyPress={this.handleKeyPress}
+                  onChange={e => this.setState({
+                    password: {value: e.target.value, isPristine: false}
+                  })}
+                  label={i18n.password}
+                  error={hasPasswordError}
+                  helperText={hasPasswordError ? i18n.errorRequired : ""}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end" className={classes.adornment}>
+                        <Icon>lock</Icon>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
 
-            <TextField
-              id="password-input"
-              type="password"
-              value={password.value}
-              onKeyPress={this.handleKeyPress}
-              onChange={e => this.setState({
-                password: {value: e.target.value, isPristine: false}
-              })}
-              label={i18n.password}
-              error={hasPasswordError}
-              helperText={hasPasswordError ? i18n.errorRequired : ""}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Icon>lock</Icon>
-                  </InputAdornment>
-                ),
-              }}
-            />
+              <div className={classes.section}>
+                <Button fullWidth onClick={this.handleLogin} color="primary" disabled={isLoading || !isFormComplete} variant="contained">
+                  {i18n.buttonLabel}
+                  <Icon>exit_to_app</Icon>
 
-            <br/>
-            <br/>
-            <br/>
+                  {isLoading && <CircularProgress className={classes.loadingButton} size={20}/>}
+                </Button>
+              </div>
 
-            <Button onClick={this.handleLogin} color="primary" disabled={isLoading || !isFormComplete}>
-              {i18n.buttonLabel}
-              <Icon>exit_to_app</Icon>
+              <div className={classes.forgotPasswordContainer}>
+                <Button onClick={() => console.log('clicked')} className={classes.forgotPasswordButton}>{i18n.forgotPassword}</Button>
+              </div>
+            </div>
+          </Grid>
 
-              {isLoading && <CircularProgress className={classes.loadingButton} size={20}/>}
-            </Button>
-          </Paper>
-        </div>
+          <Hidden smDown>
+            <Grid item className={classes.rightSide} xs={12} md={8}>
+              {this.renderRightSide()}
+            </Grid>
+          </Hidden>
+        </Grid>
       </Layout>
+    );
+  }
+
+  renderRightSide = () => {
+    const {classes} = this.props;
+
+    return (
+      <div className={classes.rightSideInner}>
+        <img src={Logo} alt="Inventarius" className={classes.logo}/>
+
+        <div className={classes.rightSideText}>
+          <Typography variant="h4" color="inherit">{i18n.rightTitle}</Typography>
+          <Typography color="inherit" className={classes.rightSideBody}>{i18n.rightBody}</Typography>
+        </div>
+      </div>
     );
   }
 }

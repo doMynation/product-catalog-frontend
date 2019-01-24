@@ -20,7 +20,7 @@ import Grid from "@material-ui/core/es/Grid/Grid";
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Icon from "@material-ui/core/es/Icon/Icon";
 import Uploader from "../../shared/Uploader";
-import StorePicker from "./StorePicker";
+import DepartmentPicker from "../../shared/DepartmentPicker/DepartmentPicker";
 
 const styles = theme => ({
   switches: {
@@ -212,6 +212,12 @@ class HomeTab extends Component {
               ))}
             </Select>
           </FormControl>
+
+          <DepartmentPicker
+            selectedDepartmentId={fields.departmentId.value}
+            departments={departments}
+            onSelect={department => updateField("departmentId", department.id)}
+          />
         </Grid>
 
         <Grid item xs={12}>

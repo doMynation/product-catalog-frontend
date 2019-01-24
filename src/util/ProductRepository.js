@@ -2,6 +2,24 @@ import sessionClient from '../sessionClient';
 import apiClient from '../apiClient';
 
 class ProductRepository {
+  static createDepartment(code, name) {
+    // @todo: fix this
+    const payload = {
+      code: code,
+      translations: [{
+        lang: 'fr', // @todo: un-hardcode this
+        name: name,
+        shortDescription: "",
+        longDescription: "",
+        isDefault: true
+      }],
+    };
+
+    return sessionClient
+      .post('/admin/departments', payload)
+      .then(data => data.data);
+  }
+
   static updateProduct(productId, hash, fields) {
 
     // Curate the data in the proper format

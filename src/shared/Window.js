@@ -31,28 +31,32 @@ class Window extends React.Component {
   }
 
   render() {
-    const {classes, isOpen, onClose, title, description, children} = this.props;
+    const {classes, isOpen, onClose, title, description, withButtons = true, children} = this.props;
 
     return (
       <Dialog
         open={isOpen}
         onClose={onClose}
-        aria-labelledby={title}
       >
-        <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          {title}
+        </DialogTitle>
+
         <DialogContent>
           <DialogContentText style={{marginBottom: 16}}>{description}</DialogContentText>
           {children}
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={onClose} color="primary">Annuler</Button>
-          <Button onClick={this.handleSubmit} color="primary" disabled={this.state.isLoading}>
-            Soumettre
+        {withButtons && (
+          <DialogActions>
+            <Button onClick={onClose} color="primary">Annuler</Button>
+            <Button onClick={this.handleSubmit} color="primary" disabled={this.state.isLoading}>
+              Soumettre
 
-            {this.state.isLoading && <CircularProgress className={classes.loading} size={20}/>}
-          </Button>
-        </DialogActions>
+              {this.state.isLoading && <CircularProgress className={classes.loading} size={20}/>}
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
     );
   }
@@ -61,7 +65,8 @@ class Window extends React.Component {
 Window.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  withButtons: PropTypes.bool,
+  onSubmit: PropTypes.func,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
 };
